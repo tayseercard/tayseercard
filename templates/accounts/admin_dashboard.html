@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Admin{% endblock %}
+{% block page_title %}Tableau de bord Admin{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<!-- Stats Row -->
+<div class="row g-4 mb-4">
+  <div class="col-6 col-md-4 col-xl">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#eff6ff;"><i class="bi bi-cash-stack text-primary"></i></div>
+      <div class="stat-value">{{ revenue|floatformat:0 }} <small class="fs-6 fw-normal text-muted">DZD</small></div>
+      <div class="stat-label">Chiffre d'Affaires</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#f0fdf4;"><i class="bi bi-ticket-perforated text-success"></i></div>
+      <div class="stat-value">{{ total_vouchers }}</div>
+      <div class="stat-label">Total Vouchers</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fffbeb;"><i class="bi bi-qr-code-scan text-warning"></i></div>
+      <div class="stat-value">{{ scans_today }}</div>
+      <div class="stat-label">Scans aujourd'hui</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fef2f2;"><i class="bi bi-inbox text-danger"></i></div>
+      <div class="stat-value">{{ pending_requests }}</div>
+      <div class="stat-label">Demandes en attente</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#f5f3ff;"><i class="bi bi-shop" style="color:#7c3aed;"></i></div>
+      <div class="stat-value">{{ pending_store_requests }}</div>
+      <div class="stat-label">Demandes partenaires</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Top Stores Leaderboard -->
+  <div class="col-lg-4">
+    <div class="stat-card">
+      <h6 class="mb-4 fw-700">Top Magasins (Performance)</h6>
+      <div class="leaderboard mt-2">
+        {% for store in top_stores %}
+        <div class="d-flex align-items-center justify-content-between mb-3 p-2 rounded-3 border-start border-4"
+          style="background:#f8fafc; border-start-color: var(--primary) !important;">
+          <div class="fw-600 small">{{ store.name }}</div>
+          <div class="badge bg-white border text-primary small fw-700">{{ store.scan_count }} scans</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Stores Table -->
+  <div class="col-lg-8">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h6 class="mb-0 fw-700">Dernières inscriptions</h6>
+        <a href="/admin/stores/store/add/" class="btn btn-primary btn-sm">
+          <i class="bi bi-plus-lg me-1"></i>Nouveau magasin
+        </a>
+      </div>
+      {% if stores %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th class="text-uppercase small fw-700 text-muted border-0">Magasin</th>
+              <th class="text-uppercase small fw-700 text-muted border-0 text-end">Statut</th>
+            </tr>
+          </thead>
+          <tbody class="border-top-0">
+            {% for store in stores %}
+            <tr>
+              <td class="fw-600 font-monospace" style="color: #0f172a;">{{ store.name }}</td>
+              <td class="text-end">
+                {% if store.is_active %}
+                <span class="badge badge-active">Actif</span>
+                {% else %}
+                <span class="badge badge-cancelled">Inactif</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

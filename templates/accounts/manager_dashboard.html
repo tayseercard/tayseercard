@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Manager{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+{% if not store %}
+<div class="alert alert-warning">
+  <i class="bi bi-exclamation-triangle me-2"></i>
+  Aucun magasin n'est associé à votre compte. Contactez l'administrateur.
+</div>
+{% else %}
+
+<!-- Stats Row -->
+<div class="row g-2 g-md-4 mb-4">
+  <div class="col-6 col-md-3">
+    <a href="/manager/vouchers/?status=BLANK" class="text-decoration-none text-reset d-block" style="display:block;">
+      <div class="stat-card" style="padding:12px; text-align:center;">
+        <div class="stat-icon" style="background:#eff6ff; width:32px; height:32px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; border-radius:8px;"><i class="bi bi-ticket-detailed text-primary" style="font-size:0.9rem;"></i></div>
+        <div class="stat-value" style="font-size:1.4rem; margin-bottom:4px;">{{ total_vouchers }}</div>
+        <div class="stat-label" style="font-size:0.7rem;">Total Vouchers vides</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="/manager/vouchers/?status=ACTIVE" class="text-decoration-none text-reset d-block" style="display:block;">
+      <div class="stat-card" style="padding:12px; text-align:center;">
+        <div class="stat-icon" style="background:#f0fdf4; width:32px; height:32px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; border-radius:8px;"><i class="bi bi-check2-circle text-success" style="font-size:0.9rem;"></i></div>
+        <div class="stat-value" style="font-size:1.4rem; margin-bottom:4px;">{{ active_vouchers }}</div>
+        <div class="stat-label" style="font-size:0.7rem;">Actifs</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="/manager/vouchers/?status=USED" class="text-decoration-none text-reset d-block" style="display:block;">
+      <div class="stat-card" style="padding:12px; text-align:center;">
+        <div class="stat-icon" style="background:#f8fafc; width:32px; height:32px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; border-radius:8px;"><i class="bi bi-archive text-secondary" style="font-size:0.9rem;"></i></div>
+        <div class="stat-value" style="font-size:1.4rem; margin-bottom:4px;">{{ used_vouchers }}</div>
+        <div class="stat-label" style="font-size:0.7rem;">Consommés</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card" style="padding:12px; text-align:center;">
+      <div class="stat-icon" style="background:#fffbeb; width:32px; height:32px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; border-radius:8px;"><i class="bi bi-qr-code-scan text-warning" style="font-size:0.9rem;"></i></div>
+      <div class="stat-value" style="font-size:1.4rem; margin-bottom:4px;">{{ scans_today }}</div>
+      <div class="stat-label" style="font-size:0.7rem;">Scans aujourd'hui</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Dashboard Grid -->
+<div class="row g-4">
+  <!-- Left Column: Team Productivity & Stock Status -->
+  <div class="col-lg-4">
+    <!-- Valeur des Vouchers -->
+    <div class="stat-card">
+      <h6 class="mb-4 fw-700">Valeur des Vouchers</h6>
+      
+      <!-- Active Vouchers Value -->
+      <div class="p-3 rounded-3 mb-3" style="background:#f0fdf4; border:1px solid #dcfce7;">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-success small d-block fw-600" style="font-size:0.72rem; text-transform:uppercase;">Vouchers Actifs</span>
+            <span class="fw-700 text-success" style="font-size:1.2rem;">{{ active_vouchers_amount }} DZD</span>
+          </div>
+          <div style="width:36px; height:36px; background:rgba(22,163,74,0.1); color:#16a34a; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+            <i class="bi bi-wallet2"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consumed Vouchers Value -->
+      <div class="p-3 rounded-3" style="background:#f8fafc; border:1px solid #e2e8f0;">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-secondary small d-block fw-600" style="font-size:0.72rem; text-transform:uppercase;">Vouchers Consommés</span>
+            <span class="fw-700 text-secondary" style="font-size:1.2rem;">{{ used_vouchers_amount }} DZD</span>
+          </div>
+          <div style="width:36px; height:36px; background:rgba(100,116,139,0.1); color:#64748b; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+            <i class="bi bi-check-all"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Recent Scan Activity -->
+  <div class="col-lg-8">
+    <div class="stat-card h-100">
+      <h6 class="mb-4 fw-700">Flux des Scans Récents</h6>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th class="border-0 small text-uppercase fw-700 text-muted">Voucher</th>
+              <th class="border-0 small text-uppercase fw-700 text-muted">Chargé de scan</th>
+              <th class="border-0 small text-uppercase fw-700 text-muted text-end">Date / Heure</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for scan in recent_scans %}
+            <tr>
+              <td>
+                <div class="fw-700 small" style="color: #0f172a;">{{ scan.voucher.title|truncatechars:35 }}</div>
+                <div class="text-muted" style="font-size: 0.75rem;">ID: {{ scan.voucher.code|stringformat:".8s" }}...
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="bg-light rounded-circle small text-center"
+                    style="width:24px; height:24px; line-height:24px;">
+                    <i class="bi bi-person"></i>
+                  </div>
+                  <span class="small">{{ scan.scanned_by.username }}</span>
+                </div>
+              </td>
+              <td class="text-end">
+                <div class="small fw-600">{{ scan.scanned_at|date:"d M, H:i" }}</div>
+                <div class="text-muted small">{{ scan.scanned_at|timesince }}</div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" class="text-center py-4 text-muted small">Aucun scan enregistré à ce jour.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+{% endblock %}

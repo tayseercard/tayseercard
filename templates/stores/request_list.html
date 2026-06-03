@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Demandes partenaires{% endblock %}
+{% block nav_store_requests %}active{% endblock %}
+{% block page_title %}Demandes de partenariat{% endblock %}
+
+{% block content %}
+<div class="stat-card">
+  {% if requests %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle" style="font-size:0.88rem;">
+      <thead style="color:#64748b;">
+        <tr>
+          <th>Nom du magasin</th>
+          <th>Contact</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in requests %}
+        <tr>
+          <td>
+            <div class="fw-500">{{ item.store_name }}</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">{{ item.full_name }}</div>
+          </td>
+          <td>{{ item.phone|default:'-' }}</td>
+          <td>{{ item.email }}</td>
+          <td>
+            <span class="badge" style="background:{% if item.status == 'PENDING' %}#fef3c7{% elif item.status == 'APPROVED' %}#dcfce7{% else %}#fee2e2{% endif %}; color:{% if item.status == 'PENDING' %}#b45309{% elif item.status == 'APPROVED' %}#166534{% else %}#b91c1c{% endif %}; border-radius:8px; padding:6px 12px;">
+              {{ item.get_status_display }}
+            </span>
+          </td>
+          <td style="color:#64748b;">{{ item.created_at|date:"d/m/Y H:i" }}</td>
+          <td>
+            <a href="{% url 'store_request_detail' item.pk %}" class="btn btn-sm" style="background:#2563eb; color:#fff; border-radius:8px; font-size:0.8rem;">
+              <i class="bi bi-eye me-1"></i>Voir
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-inbox fs-1 d-block mb-2" style="opacity:0.3;"></i>
+    Aucune demande de partenariat.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

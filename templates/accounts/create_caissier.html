@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajouter Caissier{% endblock %}
+{% block page_title %}Nouveau compte caissier{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="stat-card">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a href="{% url 'caissier_list' %}" class="btn btn-light btn-sm border rounded-circle p-2"
+                    style="width:36px; height:36px; display:flex; align-items:center; justify-content:center;">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h5 class="mb-0 fw-700">Créer un profil pour <span class="text-primary">{{ store.name }}</span></h5>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-700 text-muted">Prénom</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-700 text-muted">Nom</label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-700 text-muted">Nom d'utilisateur</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-700 text-muted">Adresse Email</label>
+                        {{ form.email }}
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-700 text-muted">Mot de passe</label>
+                        {{ form.password }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-700 text-muted">Confirmer le mot de passe</label>
+                        {{ form.password_confirm }}
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mt-5">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        Créer le compte caissier
+                    </button>
+                    <a href="{% url 'caissier_list' %}" class="btn btn-light border px-4">
+                        Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

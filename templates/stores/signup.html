@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% block title %}Inscription Magasin{% endblock %}
+{% block auth_content %}
+<style>
+  .auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 32px 16px;
+  }
+  .auth-card {
+    width: 100%;
+    max-width: 840px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+  }
+  .auth-card h4 {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    color: #0f172a;
+  }
+  .auth-card p {
+    color: #475569;
+    margin-bottom: 24px;
+  }
+  .form-group {
+    margin-bottom: 18px;
+  }
+  .form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+    font-weight: 600;
+    font-size: 0.88rem;
+  }
+  .form-control {
+    width: 100%;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    padding: 12px 16px;
+    font-size: 0.92rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    outline: none;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .btn-primary-custom {
+    background: #2563eb;
+    border: 1px solid #2563eb;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-weight: 600;
+    width: 100%;
+    transition: all 0.2s ease;
+  }
+  .btn-primary-custom:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  }
+  .btn-mini-gray {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .btn-mini-gray:hover {
+    background: #e2e8f0;
+    color: #1f2937;
+  }
+  .text-danger {
+    font-size: 0.82rem;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+</style>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="d-flex justify-content-between align-items-center mb-4 gap-3">
+      <div>
+        <h4>Inscription du magasin</h4>
+        <p>Inscrivez votre magasin et votre compte de gérant avec email et mot de passe.</p>
+      </div>
+      <a href="{% url 'home' %}" class="btn btn-mini-gray d-none d-md-inline-flex align-items-center gap-2">
+        <i class="bi bi-house-door-fill"></i>Accueil
+      </a>
+    </div>
+
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="alert alert-danger mb-4" style="border-radius:12px;">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" autocomplete="off">
+      {% csrf_token %}
+      
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger mb-4" style="border-radius:12px;">
+        {% for error in form.non_field_errors %}
+          <div>{{ error }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="row g-4 mb-4">
+        <!-- Store Column -->
+        <div class="col-md-6">
+          <h5 class="section-title text-primary"><i class="bi bi-shop"></i> Informations du Magasin</h5>
+          
+          <div class="form-group">
+            <label class="form-label">Nom du magasin</label>
+            {{ form.store_name }}
+            {% if form.store_name.errors %}<div class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>{{ form.store_name.errors.0 }}</div>{% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}<div class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>{{ form.phone.errors.0 }}</div>{% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Adresse</label>
+            {{ form.address }}
+            {% if form.address.errors %}<div class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>{{ form.address.errors.0 }}</div>{% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Description (optionnel)</label>
+            {{ form.description }}
+            {% if form.description.errors %}<div class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>{{ form.description.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <!-- Manager Column -->
+        <div class="col-md-6">
+          <h5 class="section-title text-success"><i class="bi bi-person-badge"></i> Compte du Gérant</h5>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Prénom</label>
+              {{ form.manager_first_name }}
+              {% if form.manager_first_name.errors %}<div class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>{{ form.manager_first_name.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nom</label>
+              {{ form.manager_last_name }}
+              {% if form.manager_last_name.errors %}<div class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>{{ form.manager_last_name.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Email professionnel</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>{{ form.email.errors.0 }}</div>{% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Mot de passe</label>
+            {{ form.password }}
+            {% if form.password.errors %}<div class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>{{ form.password.errors.0 }}</div>{% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Confirmer le mot de passe</label>
+            {{ form.password_confirm }}
+            {% if form.password_confirm.errors %}<div class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>{{ form.password_confirm.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary-custom mb-3">Envoyer la demande</button>
+      
+      <div class="text-center">
+        <span class="text-muted" style="font-size:0.9rem;">Vous avez déjà un compte ?</span>
+        <a href="{% url 'login' %}" class="fw-600 text-decoration-none ms-1" style="color:#2563eb; font-size:0.9rem;">Se connecter</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

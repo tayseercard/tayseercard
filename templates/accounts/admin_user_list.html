@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Utilisateurs{% endblock %}
+{% block page_title %}Liste des utilisateurs{% endblock %}
+{% block nav_users %}active{% endblock %}
+
+{% block content %}
+<div class="stat-card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h6 class="mb-0 fw-600" style="color:#0f172a;">Tous les utilisateurs</h6>
+      <p class="text-muted mb-0" style="font-size:0.9rem;">Liste des comptes et rôles gérés par l'administrateur.</p>
+    </div>
+  </div>
+
+  {% if users %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle" style="font-size:0.88rem;">
+      <thead style="color:#64748b;">
+        <tr>
+          <th>Nom d'utilisateur</th>
+          <th>Nom complet</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Actif</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td class="fw-500">{{ user.username }}</td>
+          <td>{{ user.get_full_name }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <span class="role-pill role-{{ user.role|lower }}">{{ user.get_role_display }}</span>
+          </td>
+          <td>
+            {% if user.is_active %}
+            <span class="badge badge-active px-2 py-1" style="border-radius:6px; font-size:0.75rem;">Oui</span>
+            {% else %}
+            <span class="badge badge-cancelled px-2 py-1" style="border-radius:6px; font-size:0.75rem;">Non</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-4 text-muted">
+    <i class="bi bi-people fs-1 d-block mb-2" style="opacity:0.3;"></i>
+    Aucun utilisateur trouvé.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

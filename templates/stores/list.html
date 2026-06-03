@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Magasins{% endblock %}
+{% block nav_stores %}active{% endblock %}
+{% block page_title %}Gestion des magasins{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <p class="text-muted mb-0" style="font-size:0.88rem;">Liste des magasins enregistrés dans le système.</p>
+  </div>
+  <a href="{% url 'store_create' %}" class="btn" style="background:#2563eb; color:#fff; border-radius:10px; padding:9px 20px; font-weight:500;">
+    <i class="bi bi-plus-lg me-1"></i>Ajouter magasin
+  </a>
+</div>
+
+<div class="stat-card">
+  {% if stores %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle" style="font-size:0.9rem;">
+      <thead style="color:#64748b;">
+        <tr>
+          <th>Magasin</th>
+          <th>Gérant</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Adresse</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for store in stores %}
+        <tr>
+          <td>
+            <div class="fw-600">{{ store.name }}</div>
+            {% if store.description %}
+            <div class="text-muted" style="font-size:0.82rem;">{{ store.description|truncatechars:80 }}</div>
+            {% endif %}
+          </td>
+          <td>{{ store.manager.get_full_name|default:store.manager.username }}</td>
+          <td>{{ store.manager.email|default:'-' }}</td>
+          <td>{{ store.phone|default:'-' }}</td>
+          <td>{{ store.address|default:'-' }}</td>
+          <td>
+            {% if store.is_active %}
+            <span class="badge" style="background:#dcfce7; color:#15803d; border-radius:8px; padding:5px 10px; font-size:0.75rem;">Actif</span>
+            {% else %}
+            <span class="badge" style="background:#fecaca; color:#b91c1c; border-radius:8px; padding:5px 10px; font-size:0.75rem;">Inactif</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            <div class="d-flex justify-content-end gap-2">
+              <a href="{% url 'admin:stores_store_change' store.pk %}" class="btn btn-sm" style="background:#f1f5f9; color:#475569; border-radius:8px; display:inline-flex; align-items:center;">
+                <i class="bi bi-pencil-square me-1"></i>Modifier
+              </a>
+              <form method="post" action="{% url 'store_delete' store.pk %}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce magasin ? Tous les vouchers associés seront également définitivement supprimés.');" class="d-inline m-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm" style="background:#fee2e2; color:#b91c1c; border-radius:8px; border:none; padding:6px 12px; font-weight:600; display:inline-flex; align-items:center;">
+                  <i class="bi bi-trash-fill me-1"></i>Supprimer
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-shop fs-1 d-block mb-3" style="opacity:0.3;"></i>
+    Aucun magasin trouvé.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

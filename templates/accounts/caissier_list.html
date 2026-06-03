@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion de l'Équipe{% endblock %}
+{% block page_title %}Gestion des Caissiers{% endblock %}
+{% block nav_team %}active{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="mb-1 fw-700">Membres de l'équipe</h5>
+                    <p class="text-muted small mb-0">Gérez les comptes de vos caissiers pour le magasin <strong>{{
+                            store.name }}</strong></p>
+                </div>
+                <a href="{% url 'create_caissier' %}" class="btn btn-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Ajouter un caissier</span>
+                </a>
+            </div>
+
+            {% if caissiers %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle border-top">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="border-0 px-4 py-3 text-uppercase small fw-700 text-muted">Utilisateur</th>
+                            <th class="border-0 py-3 text-uppercase small fw-700 text-muted">Nom Complet</th>
+                            <th class="border-0 py-3 text-uppercase small fw-700 text-muted">Email</th>
+                            <th class="border-0 py-3 text-uppercase small fw-700 text-muted text-end px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in caissiers %}
+                        <tr>
+                            <td class="px-4 py-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="stat-icon m-0"
+                                        style="background:#f1f5f9; width:40px; height:40px; border-radius: 50%;">
+                                        <i class="bi bi-person text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-700" style="color: #0f172a;">{{ c.username }}</div>
+                                        <div class="small text-muted">ID: #{{ c.id }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ c.get_full_name|default:"-" }}</td>
+                            <td class="text-muted">{{ c.email|default:"-" }}</td>
+                            <td class="text-end px-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'edit_caissier' c.id %}" class="btn btn-light btn-sm border px-3"
+                                        title="Modifier">
+                                        <i class="bi bi-pencil-square text-primary"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'delete_caissier' c.id %}"
+                                        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce caissier ? Cette action est irréversible.')"
+                                        style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-light btn-sm border px-3"
+                                            title="Supprimer">
+                                            <i class="bi bi-trash3 text-danger"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 border rounded-3 bg-light">
+                <i class="bi bi-people fs-1 opacity-25 d-block mb-3"></i>
+                <h6 class="fw-700">Aucun caissier enregistré</h6>
+                <p class="text-muted small mb-4">Commencez par ajouter votre premier membre d'équipe pour scanner les
+                    vouchers.</p>
+                <a href="{% url 'create_caissier' %}" class="btn btn-primary btn-sm px-4">Ajouter maintenant</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

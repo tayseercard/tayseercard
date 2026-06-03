@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Caissier{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+{% if not store %}
+<div class="alert alert-warning">
+  <i class="bi bi-exclamation-triangle me-2"></i>
+  Aucun magasin n'est associé à votre compte. Contactez l'administrateur.
+</div>
+{% else %}
+
+<!-- Stats Row -->
+<div class="row g-2 mb-3">
+  <div class="col-6 col-md-3">
+    <div class="stat-card" style="padding:10px 12px; text-align:center;">
+      <div class="stat-icon" style="background:#fffbeb; width:28px; height:28px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; border-radius:8px;"><i class="bi bi-qr-code-scan text-warning" style="font-size:0.85rem;"></i></div>
+      <div class="stat-value" style="font-size:1.2rem; margin-bottom:2px;">{{ scans_today }}</div>
+      <div class="stat-label" style="font-size:0.65rem;">Scans aujourd'hui</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card" style="padding:10px 12px; text-align:center;">
+      <div class="stat-icon" style="background:#f0fdf4; width:28px; height:28px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; border-radius:8px;"><i class="bi bi-shop text-success" style="font-size:0.85rem;"></i></div>
+      <div class="stat-value" style="font-size:1.2rem; margin-bottom:2px;">{{ store.name|truncatechars:15 }}</div>
+      <div class="stat-label" style="font-size:0.65rem;">Magasin</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card" style="padding:10px 12px; text-align:center;">
+      <div class="stat-icon" style="background:#eef2ff; width:28px; height:28px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; border-radius:8px;"><i class="bi bi-currency-dollar text-primary" style="font-size:0.85rem;"></i></div>
+      <div class="stat-value" style="font-size:1.2rem; margin-bottom:2px;">{{ activated_amount }} DA</div>
+      <div class="stat-label" style="font-size:0.65rem;">Montant activé</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card" style="padding:10px 12px; text-align:center;">
+      <div class="stat-icon" style="background:#eff6ff; width:28px; height:28px; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; border-radius:8px;"><i class="bi bi-person text-primary" style="font-size:0.85rem;"></i></div>
+      <div class="stat-value" style="font-size:1.2rem; margin-bottom:2px;">{{ user.get_full_name|default:user.username }}</div>
+      <div class="stat-label" style="font-size:0.65rem;">Caissier</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="row g-4">
+  <div class="col-12">
+    <div class="stat-card mb-3" style="padding:12px 14px;">
+      <h6 class="mb-3 fw-700" style="font-size:0.95rem;">
+        <i class="bi bi-person-check-fill me-2" style="color:#0f172a;"></i>Vouchers activés
+      </h6>
+      {% if activated_vouchers %}
+      <div class="table-responsive mb-2">
+        <table class="table table-sm table-hover align-middle mb-0" style="font-size:0.82rem;">
+          <thead style="color:#64748b; font-size:0.8rem; text-transform:uppercase; font-weight:600;">
+            <tr>
+              <th class="border-0">Client / Bénéficiaire</th>
+              <th class="border-0">Valeur</th>
+              <th class="border-0">Restant</th>
+              <th class="border-0">Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for voucher in activated_vouchers %}
+            <tr>
+              <td>
+                <div class="fw-600 small" style="color:#0f172a;">{{ voucher.customer_name|default:"–" }}</div>
+                {% if voucher.beneficiary_name %}
+                <div class="text-muted" style="font-size:0.75rem;">{{ voucher.beneficiary_name }}</div>
+                {% endif %}
+              </td>
+              <td style="color:#2563eb; font-weight:600;">{{ voucher.value }} DA</td>
+              <td style="color:{% if voucher.remaining_value == 0 %}#dc2626{% else %}#16a34a{% endif %}; font-weight:600;">{{ voucher.remaining_value }} DA</td>
+              <td>
+                {% if voucher.status == 'ACTIVE' %}
+                <span class="badge" style="background:#dcfce7; color:#16a34a; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Actif</span>
+                {% elif voucher.status == 'USED' %}
+                <span class="badge" style="background:#f1f5f9; color:#475569; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Consommé</span>
+                {% else %}
+                <span class="badge" style="background:#fee2e2; color:#dc2626; border-radius:6px; font-size:0.75rem; padding:4px 10px;">{{ voucher.get_status_display }}</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info mb-0" style="border-radius:10px;">
+        <i class="bi bi-info-circle me-2"></i>
+        Aucun voucher activé par vous pour le moment.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="stat-card" style="padding:12px 14px;">
+      <h6 class="mb-3 fw-700" style="font-size:0.95rem;">
+        <i class="bi bi-clock-history me-2" style="color:#2563eb;"></i>Historique des Scans Récents
+      </h6>
+      
+      {% if recent_scans %}
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0" style="font-size:0.82rem;">
+          <thead style="color:#64748b; font-size:0.75rem; text-transform:uppercase; font-weight:600;">
+            <tr>
+              <th class="border-0">Voucher</th>
+              <th class="border-0">Date / Heure</th>
+              <th class="border-0">Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for scan in recent_scans %}
+            <tr>
+              <td>
+                <div class="fw-600 small" style="color:#0f172a;">{{ scan.voucher.title|truncatechars:35 }}</div>
+                <div class="text-muted" style="font-size:0.75rem;">{{ scan.voucher.store.name }}</div>
+              </td>
+              <td style="color:#64748b; font-size:0.75rem;">{{ scan.scanned_at|date:"d/m/Y H:i" }}</td>
+              <td>
+                {% if scan.voucher.status == 'ACTIVE' %}
+                <span class="badge" style="background:#dcfce7; color:#16a34a; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Actif</span>
+                {% elif scan.voucher.status == 'USED' %}
+                <span class="badge" style="background:#f1f5f9; color:#475569; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Consommé</span>
+                {% elif scan.voucher.status == 'EXPIRED' %}
+                <span class="badge" style="background:#fef3c7; color:#d97706; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Expiré</span>
+                {% else %}
+                <span class="badge" style="background:#fee2e2; color:#dc2626; border-radius:6px; font-size:0.75rem; padding:4px 10px;">{{ scan.voucher.get_status_display }}</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info mb-0" style="border-radius:10px;">
+        <i class="bi bi-info-circle me-2"></i>
+        Aucun scan enregistré pour le moment.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endif %}
+{% endblock %}

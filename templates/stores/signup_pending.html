@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Demande en cours d'examen — TayseerCard{% endblock %}
+{% block auth_content %}
+<style>
+  .auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 32px 16px;
+  }
+  .auth-card {
+    width: 100%;
+    max-width: 540px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 48px 40px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    text-align: center;
+  }
+  .hourglass-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: rgba(37, 99, 235, 0.1);
+    border-radius: 50%;
+    margin-bottom: 24px;
+    color: #2563eb;
+    font-size: 2.5rem;
+    animation: pulse-glow 2s infinite ease-in-out;
+  }
+  @keyframes pulse-glow {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+    }
+    70% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 15px rgba(37, 99, 235, 0);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    }
+  }
+  .auth-card h4 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 16px;
+  }
+  .status-badge {
+    display: inline-block;
+    background: #fef3c7;
+    color: #d97706;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .auth-card p {
+    color: #475569;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  .btn-primary-custom {
+    background: #2563eb;
+    border: 1px solid #2563eb;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    width: 100%;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary-custom:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    color: #ffffff;
+  }
+</style>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="hourglass-container">
+      <i class="bi bi-hourglass-split"></i>
+    </div>
+    
+    <h4>Demande en cours d'examen</h4>
+    
+    <div class="status-badge">
+      <i class="bi bi-clock-history me-1"></i> Statut : En attente (Pending)
+    </div>
+    
+    <p>
+      Votre inscription a bien été enregistrée. Pour des raisons de sécurité, chaque nouveau compte partenaire doit être validé par un administrateur avant de pouvoir se connecter.
+      <br><br>
+      Vous recevrez un e-mail de confirmation dès que votre demande aura été approuvée.
+    </p>
+    
+    <a href="{% url 'home' %}" class="btn btn-primary-custom">
+      <i class="bi bi-house-door-fill me-2"></i> Retour à l'accueil
+    </a>
+  </div>
+</div>
+{% endblock %}

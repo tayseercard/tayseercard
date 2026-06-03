@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block title %}Paramètres{% endblock %}
+{% block page_title %}Paramètres{% endblock %}
+{% block nav_settings %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  .settings-tabs .nav-link {
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .settings-tabs .nav-link:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+
+  .settings-tabs .nav-link.active {
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+
+  .settings-tabs .nav-link i {
+    font-size: 1rem;
+  }
+
+  .settings-header {
+    background: linear-gradient(135deg, #1e293b 0%, #2563eb 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    color: white;
+  }
+
+  .tab-pane {
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .user-row:hover {
+    background: #f8fafc;
+  }
+
+  .form-control,
+  .form-select {
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .btn-save {
+    background: #2563eb;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 28px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-save:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+  }
+
+  textarea {
+    min-height: 220px;
+    resize: vertical;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row g-4">
+  <!-- Tab Nav -->
+  <div class="col-lg-3">
+    <div class="stat-card p-3" style="position: sticky; top: 80px;">
+      <p class="text-muted mb-2"
+        style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Navigation</p>
+      <div class="nav flex-column settings-tabs gap-1" id="settings-nav" role="tablist">
+        <button class="nav-link {% if active_tab == 'profile' or not active_tab %}active{% endif %}"
+          data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab">
+          <i class="bi bi-person-circle"></i> Mon profil
+        </button>
+        <button class="nav-link {% if active_tab == 'users' %}active{% endif %}" data-bs-toggle="tab"
+          data-bs-target="#tab-users" type="button" role="tab">
+          <i class="bi bi-people-fill"></i> Utilisateurs
+          <span class="badge rounded-pill ms-auto"
+            style="background:rgba(37,99,235,0.1); color:#2563eb; font-size:0.7rem;">{{ users|length }}</span>
+        </button>
+        <button class="nav-link {% if active_tab == 'terms' %}active{% endif %}" data-bs-toggle="tab"
+          data-bs-target="#tab-terms" type="button" role="tab">
+          <i class="bi bi-file-earmark-text-fill"></i> Conditions générales
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="col-lg-9">
+    <div class="tab-content">
+
+      <!-- ===== PROFILE TAB ===== -->
+      <div class="tab-pane fade {% if active_tab == 'profile' or not active_tab %}show active{% endif %}"
+        id="tab-profile" role="tabpanel">
+        <div class="stat-card">
+          <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+            <div
+              style="width:44px; height:44px; background:#eff6ff; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+              <i class="bi bi-person-fill" style="color:#2563eb; font-size:1.25rem;"></i>
+            </div>
+            <div>
+              <h6 class="mb-0 fw-700">Informations personnelles</h6>
+              <small class="text-muted">Mettez à jour votre nom, email et identifiant de connexion.</small>
+            </div>
+          </div>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="submitted_tab" value="profile">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-600" style="font-size:0.85rem;">Prénom</label>
+                {{ form.first_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-600" style="font-size:0.85rem;">Nom</label>
+                {{ form.last_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-600" style="font-size:0.85rem;">Email</label>
+                {{ form.email }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-600" style="font-size:0.85rem;">Nom d'utilisateur</label>
+                {{ form.username }}
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn-save btn">Enregistrer les modifications</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===== USERS TAB ===== -->
+      <div class="tab-pane fade {% if active_tab == 'users' %}show active{% endif %}" id="tab-users" role="tabpanel">
+        <div class="stat-card">
+          <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+            <div
+              style="width:44px; height:44px; background:#f0fdf4; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+              <i class="bi bi-people-fill" style="color:#10b981; font-size:1.25rem;"></i>
+            </div>
+            <div>
+              <h6 class="mb-0 fw-700">Gestion des utilisateurs</h6>
+              <small class="text-muted">Liste de tous les comptes gérés par l'administrateur.</small>
+            </div>
+          </div>
+          {% if users %}
+          <div class="table-responsive">
+            <table class="table align-middle" style="font-size:0.88rem;">
+              <thead>
+                <tr style="color:#64748b; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">
+                  <th class="border-0">Utilisateur</th>
+                  <th class="border-0">Email</th>
+                  <th class="border-0">Rôle</th>
+                  <th class="border-0 text-center">Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for u in users %}
+                <tr class="user-row" style="border-bottom:1px solid #f1f5f9;">
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div
+                        style="width:34px; height:34px; background:#f1f5f9; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem;">
+                        <i class="bi bi-person" style="color:#64748b;"></i>
+                      </div>
+                      <div>
+                        <div class="fw-600">{{ u.get_full_name|default:u.username }}</div>
+                        <div class="text-muted" style="font-size:0.75rem;">@{{ u.username }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-muted">{{ u.email|default:"—" }}</td>
+                  <td><span class="role-pill role-{{ u.role|lower }}">{{ u.get_role_display }}</span></td>
+                  <td class="text-center">
+                    {% if u.is_active %}
+                    <span class="badge badge-active" style="font-size:0.72rem;">Actif</span>
+                    {% else %}
+                    <span class="badge badge-cancelled" style="font-size:0.72rem;">Inactif</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-people fs-1 d-block mb-2" style="opacity:0.3;"></i>
+            Aucun utilisateur trouvé.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ===== TERMS TAB ===== -->
+      <div class="tab-pane fade {% if active_tab == 'terms' %}show active{% endif %}" id="tab-terms" role="tabpanel">
+        <div class="stat-card">
+          <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+            <div
+              style="width:44px; height:44px; background:#fff7ed; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+              <i class="bi bi-file-earmark-text-fill" style="color:#f59e0b; font-size:1.25rem;"></i>
+            </div>
+            <div>
+              <h6 class="mb-0 fw-700">Conditions générales</h6>
+              <small class="text-muted">Modifiez le texte affiché dans les conditions d'utilisation du service.</small>
+            </div>
+          </div>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="submitted_tab" value="terms">
+            <div class="mb-3">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Contenu des conditions générales</label>
+              {{ terms_form.content }}
+            </div>
+            <div class="d-flex gap-2 mt-3">
+              <button type="submit" class="btn-save btn">Enregistrer</button>
+            </div>
+          </form>
+          {% if term.content %}
+          <div class="mt-4 pt-4 border-top">
+            <h6 class="fw-700 mb-3"
+              style="font-size:0.85rem; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Aperçu actuel
+            </h6>
+            <div class="border rounded-3 p-3"
+              style="background:#f8fafc; white-space:pre-wrap; font-size:0.88rem; color:#374151; line-height:1.7;">{{
+              term.content }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

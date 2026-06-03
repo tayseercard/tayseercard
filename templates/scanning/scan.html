@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block title %}Scanner QR{% endblock %}
+{% block page_title %}Scanner un voucher{% endblock %}
+{% block nav_scan %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  #reader { width: 100%; max-width: 500px; border-radius: 16px; overflow: hidden; }
+  .scan-result {
+    border-radius: 14px; padding: 20px;
+    display: none; margin-top: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+  .scan-result.valid { background: #dcfce7; border: 2px solid #16a34a; }
+  .scan-result.invalid { background: #fee2e2; border: 2px solid #dc2626; }
+  .scan-result.valid .result-icon { color: #16a34a; }
+  .scan-result.invalid .result-icon { color: #dc2626; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  .scan-controls .btn { border-radius: 10px; font-weight: 500; padding: 10px 20px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+
+    <div class="stat-card text-center mb-3">
+      <p class="text-muted mb-3" style="font-size:0.88rem;">
+        <i class="bi bi-info-circle me-1"></i>
+        Pointez la caméra vers le QR code du voucher pour le valider.
+      </p>
+
+      <!-- Scanner -->
+      <div id="reader" class="mx-auto mb-3"></div>
+
+      <!-- Controls -->
+      <div class="scan-controls d-flex gap-2 justify-content-center flex-wrap">
+        <button id="btn-start" class="btn" style="background:#2563eb; color:#fff;" onclick="startScanner()">
+          <i class="bi bi-camera me-1"></i>Démarrer le scan
+        </button>
+        <button id="btn-stop" class="btn" style="background:#f1f5f9; color:#475569; display:none;" onclick="stopScanner()">
+          <i class="bi bi-stop-circle me-1"></i>Arrêter
+        </button>
+      </div>
+
+      <!-- Manual input fallback -->
+      <div class="mt-3">
+        <div class="input-group" style="max-width:400px; margin:0 auto;">
+          <input type="text" id="manual-code" class="form-control" placeholder="Ou saisir le code manuellement..." style="border-radius:10px 0 0 10px;"/>
+          <button class="btn" style="background:#2563eb; color:#fff; border-radius:0 10px 10px 0;" onclick="validateManual()">
+            <i class="bi bi-check2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result card -->
+    <div id="scan-result" class="scan-result">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi result-icon fs-1" id="result-icon"></i>
+        <div>
+          <div id="result-title" class="fw-600 fs-5"></div>
+          <div id="result-message" style="font-size:0.88rem;"></div>
+          <div id="result-details" class="mt-1" style="font-size:0.82rem; color:#475569;"></div>
+          <div id="result-action" class="mt-3"></div>
+        </div>
+      </div>
+      <button class="btn btn-sm mt-3 w-100" style="background:#0f172a; color:#fff; border-radius:8px;" onclick="resetScanner()">
+        <i class="bi bi-arrow-repeat me-1"></i>Scanner un autre voucher
+      </button>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+let html5QrCode = null;
+let scanning = false;
+
+function startScanner() {
+  html5QrCode = new Html5Qrcode("reader");
+  const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+  html5QrCode.start(
+    { facingMode: "environment" }, config,
+    (decodedText) => {
+      if (!scanning) {
+        scanning = true;
+        validateCode(decodedText);
+        stopScanner();
+      }
+    },
+    () => {}  // ignore scan errors
+  ).then(() => {
+    document.getElementById('btn-start').style.display = 'none';
+    document.getElementById('btn-stop').style.display = 'inline-block';
+  }).catch(err => {
+    alert("Impossible d'accéder à la caméra: " + err);
+  });
+}
+
+function stopScanner() {
+  if (html5QrCode) {
+    html5QrCode.stop().catch(() => {});
+    document.getElementById('btn-start').style.display = 'inline-block';
+    document.getElementById('btn-stop').style.display = 'none';
+  }
+}
+
+function validateManual() {
+  const code = document.getElementById('manual-code').value.trim();
+  if (!code) return alert("Veuillez saisir un code.");
+  validateCode(code);
+}
+
+function validateCode(code) {
+  fetch("{% url 'validate_voucher' %}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': '{{ csrf_token }}',
+    },
+    body: JSON.stringify({ code: code }),
+  })
+  .then(r => r.json())
+  .then(data => showResult(data))
+  .catch(() => showResult({ valid: false, message: 'Erreur réseau. Réessayez.' }));
+}
+
+function showResult(data) {
+  const el = document.getElementById('scan-result');
+  const icon = document.getElementById('result-icon');
+  const title = document.getElementById('result-title');
+  const msg = document.getElementById('result-message');
+  const details = document.getElementById('result-details');
+  const action = document.getElementById('result-action');
+
+  el.className = 'scan-result ' + (data.valid ? 'valid' : 'invalid');
+  icon.className = 'bi result-icon fs-1 bi-' + (data.valid ? 'check-circle-fill' : 'x-circle-fill');
+  if (data.valid && data.voucher && data.voucher.status === 'BLANK') {
+    title.textContent = 'Voucher Vide';
+  } else {
+    title.textContent = data.valid ? 'Voucher Valide ✓' : 'Voucher Invalide ✗';
+  }
+  msg.textContent = data.message;
+
+  if (data.valid && data.voucher) {
+    details.innerHTML = `
+      <strong>${data.voucher.title}</strong><br>
+      Valeur: <strong>${data.voucher.value} DZD</strong> · Magasin: ${data.voucher.store}
+      ${data.voucher.remaining_value ? `<br>Solde restant: <strong>${data.voucher.remaining_value} DZD</strong>` : ''}
+    `;
+  } else {
+    details.textContent = '';
+  }
+
+  if (data.fill_url) {
+    action.innerHTML = `
+      <a href="${data.fill_url}" class="btn btn-sm mt-2 w-100" style="background:#2563eb; color:#fff; border-radius:8px;">
+        <i class="bi bi-pencil-square me-1"></i>Activer le voucher
+      </a>
+    `;
+  } else if (data.redeem_url) {
+    action.innerHTML = `
+      <a href="${data.redeem_url}" class="btn btn-sm mt-2 w-100" style="background:#f59e0b; color:#fff; border-radius:8px;">
+        <i class="bi bi-cash-coin me-1"></i>Consommer le voucher
+      </a>
+    `;
+  } else {
+    action.innerHTML = '';
+  }
+
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetScanner() {
+  scanning = false;
+  document.getElementById('scan-result').style.display = 'none';
+  document.getElementById('manual-code').value = '';
+  startScanner();
+}
+</script>
+{% endblock %}

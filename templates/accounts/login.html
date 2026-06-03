@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block auth_content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Connexion — VoucherApp</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { font-family: 'Outfit', sans-serif; }
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    }
+    .login-card {
+      background: #fff; border-radius: 20px;
+      padding: 40px; width: 100%; max-width: 420px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+    }
+    .brand-icon {
+      width: 60px; height: 60px; background: #2563eb;
+      border-radius: 16px; display: flex; align-items: center;
+      justify-content: center; font-size: 1.8rem; color: #fff; margin-bottom: 20px;
+    }
+    .form-control {
+      border-radius: 10px; padding: 12px 16px;
+      border: 1.5px solid #e2e8f0; font-size: 0.9rem;
+    }
+    .form-control:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .btn-login {
+      background: #2563eb; color: #fff; border: none;
+      border-radius: 10px; padding: 12px; font-weight: 600;
+      font-size: 0.95rem; width: 100%; transition: background 0.2s;
+    }
+    .btn-login:hover { background: #1d4ed8; color: #fff; }
+    label { font-size: 0.85rem; font-weight: 500; color: #374151; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="brand-icon">
+        <i class="bi bi-ticket-perforated-fill"></i>
+      </div>
+      <a href="{% url 'home' %}" class="btn btn-outline-primary" style="border-radius:12px; font-size:0.9rem; padding:0.55rem 0.9rem; display:flex; align-items:center; gap:0.4rem;">
+        <i class="bi bi-house-door-fill"></i>Accueil
+      </a>
+    </div>
+    <h4 class="fw-700 mb-1" style="color:#0f172a;">Connexion</h4>
+    <p class="text-muted mb-4" style="font-size:0.88rem;">Accédez à votre espace VoucherApp</p>
+
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="alert alert-danger" style="border-radius:10px; font-size:0.85rem;">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label>Adresse e-mail</label>
+        <input type="email" name="email" class="form-control" placeholder="votre@email.com" required/>
+      </div>
+      <div class="mb-4">
+        <label>Mot de passe</label>
+        <input type="password" name="password" class="form-control" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="btn btn-login">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+      </button>
+    </form>
+    <div class="text-center mt-4">
+      <span class="text-muted" style="font-size:0.85rem;">Pas encore partenaire ?</span>
+      <a href="{% url 'store_signup' %}" class="fw-600 text-decoration-none ms-1" style="color:#2563eb; font-size:0.85rem;">Devenir partenaire</a>
+    </div>
+  </div>
+</body>
+</html>
+{% endblock %}

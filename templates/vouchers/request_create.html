@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Nouvelle demande{% endblock %}
+{% block page_title %}Nouvelle demande de voucher{% endblock %}
+{% block nav_create %}active{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="stat-card">
+      <h6 class="fw-600 mb-4" style="color:#0f172a;">
+        <i class="bi bi-send me-2" style="color:#2563eb;"></i>
+        Soumettre une demande à l'administrateur
+      </h6>
+
+      <div class="alert" style="background:#dbeafe; border-radius:10px; font-size:0.85rem; color:#1e40af;">
+        <i class="bi bi-info-circle me-2"></i>
+        Votre demande sera examinée par l'administrateur. Une fois approuvée, les QR codes seront générés
+        automatiquement.
+      </div>
+
+      <form method="post" class="mt-3">
+        {% csrf_token %}
+        <div class="row g-3">
+          <!-- Price Template Selection -->
+          <div class="col-12">
+            <label class="form-label fw-500" style="font-size:0.85rem;">Modèle de voucher</label>
+            <select class="form-control" id="id_price_template" name="price_template" required>
+              <option value="">-- Sélectionnez un modèle --</option>
+              {% for template in form.price_template.field.queryset %}
+              <option value="{{ template.id }}" data-value="{{ template.value }}" data-price="{{ template.price }}"
+                data-pack-qty="{{ template.pack_quantity }}">
+                {{ template.title }} ({{ template.price }} DZD) {% if template.pack_quantity > 1 %}- Pack de {{
+                template.pack_quantity }}{% endif %}
+              </option>
+              {% endfor %}
+            </select>
+            <small class="text-muted d-block mt-1">Sélectionnez le type et la valeur du voucher</small>
+          </div>
+
+          <!-- Template Details removed per request -->
+
+          <!-- Quantity -->
+          <div class="col-md-6" id="quantity_container">
+            <label class="form-label fw-500" style="font-size:0.85rem;" id="quantity_label">Quantité
+              (Packs/Unités)</label>
+            {{ form.quantity }}
+          </div>
+
+          <!-- Total Amount (Highlighted) -->
+          <div class="col-md-6">
+            <label class="form-label fw-500" style="font-size:0.85rem;" id="total_label">Montant total (DZD)</label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="id_total" readonly
+                style="background:#dcfce7; font-weight:600; font-size:1.1rem;">
+              <span class="input-group-text" style="background:#16a34a; color:#fff; border:none;">DZD</span>
+            </div>
+            <small class="text-success mt-1 d-block" id="total_vouchers_hint"></small>
+          </div>
+
+          <!-- Expiration Date removed per request -->
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn"
+            style="background:#2563eb; color:#fff; border-radius:10px; padding:10px 24px; font-weight:500;">
+            <i class="bi bi-send me-2"></i>Envoyer la demande
+          </button>
+          <a href="{% url 'voucher_request_list' %}" class="btn"
+            style="background:#f1f5f9; color:#475569; border-radius:10px; padding:10px 24px;">
+            Annuler
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Parse price template data and update totals dynamically
+  const priceTemplateSelect = document.getElementById('id_price_template');
+  const quantityInput = document.getElementById('id_quantity');
+  const quantityContainer = document.getElementById('quantity_container');
+  const totalInput = document.getElementById('id_total');
+  const totalVouchersHint = document.getElementById('total_vouchers_hint');
+
+  function updateTotalAmount() {
+    const selectedOption = priceTemplateSelect.options[priceTemplateSelect.selectedIndex];
+    if (!selectedOption || !selectedOption.dataset.price) {
+      totalInput.value = '';
+      totalVouchersHint.textContent = '';
+      return;
+    }
+
+    const priceData = selectedOption.dataset;
+    const packQty = parseInt(priceData.packQty) || 1;
+
+    // If it's a pack, lock quantity to 1 for the 'Pack' logic (and visually hide/restrict)
+    if (packQty > 1 && !selectedOption.text.toLowerCase().includes('custom')) {
+      // Often users just buy 1 pack at a time, but if they want 2 packs of 50, it multiplies.
+      // Let's allow picking number of packs!
+      document.getElementById('quantity_label').textContent = "Nombre de Packs";
+    } else {
+      document.getElementById('quantity_label').textContent = "Quantité (QR)";
+    }
+
+    // Calculate total
+    const quantity = parseInt(quantityInput.value) || 0;
+    const unitPrice = parseFloat(priceData.price) || 0;
+    totalInput.value = (quantity * unitPrice).toFixed(2);
+
+    // Show total generated QRs hint
+    const totalQrs = quantity * packQty;
+    if (totalQrs > 0) {
+      totalVouchersHint.textContent = "Générera " + totalQrs + " QR codes";
+    } else {
+      totalVouchersHint.textContent = "";
+    }
+  }
+
+  // Event listeners
+  priceTemplateSelect.addEventListener('change', updateTotalAmount);
+  quantityInput.addEventListener('input', updateTotalAmount);
+
+  // Initialize on page load
+  updateTotalAmount();
+</script>
+{% endblock %}

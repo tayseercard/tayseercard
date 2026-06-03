@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Historique{% endblock %}
+{% block page_title %}Historique des actions{% endblock %}
+{% block nav_history %}active{% endblock %}
+
+{% block content %}
+<div class="stat-card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h5 class="mb-1">Historique des actions</h5>
+      <p class="text-muted mb-0" style="font-size:0.92rem;">Toutes vos actions de scan, activation et consommation classées par date et heure.</p>
+    </div>
+  </div>
+
+  {% if history_items %}
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle mb-0" style="font-size:0.88rem;">
+      <thead style="color:#64748b; font-size:0.75rem; text-transform:uppercase; font-weight:600;">
+        <tr>
+          <th class="border-0">Date / Heure</th>
+          <th class="border-0">Action</th>
+          <th class="border-0">Client / Bénéficiaire</th>
+          <th class="border-0">Montant</th>
+          <th class="border-0">Restant</th>
+          <th class="border-0">Statut</th>
+          <th class="border-0">Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in history_items %}
+        <tr>
+          <td style="color:#64748b; font-size:0.75rem;">{{ item.timestamp|date:"d/m/Y H:i" }}</td>
+          <td>{{ item.type }}</td>
+          <td>
+            <div class="fw-600 small" style="color:#0f172a;">{{ item.voucher.customer_name|default:"–" }}</div>
+            {% if item.voucher.beneficiary_name %}
+            <div class="text-muted" style="font-size:0.75rem;">{{ item.voucher.beneficiary_name }}</div>
+            {% endif %}
+          </td>
+          <td style="color:#2563eb; font-weight:600;">{{ item.amount }} DA</td>
+          <td style="color:{% if item.remaining == 0 %}#dc2626{% else %}#16a34a{% endif %}; font-weight:600;">{{ item.remaining }} DA</td>
+          <td>{{ item.status }}</td>
+          <td style="color:#64748b; font-size:0.75rem;">{{ item.note|default:"-" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-clock-history fs-1 d-block mb-2" style="opacity:0.3;"></i>
+    Aucun historique disponible pour le moment.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

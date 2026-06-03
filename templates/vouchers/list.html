@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% block title %}Vouchers{% endblock %}
+{% block page_title %}Vouchers actifs{% endblock %}
+{% block nav_vouchers %}active{% endblock %}
+
+{% block content %}
+<div class="stat-card">
+  <!-- Filter Toggle -->
+  <button class="btn btn-sm mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection"
+    style="background:#f8fafc; color:#475569; border:1px solid #e2e8f0; border-radius:8px; padding:8px 16px; font-weight:600; font-size:0.85rem;">
+    <i class="bi bi-funnel me-2"></i>Filtres & Recherche
+    <i class="bi bi-chevron-down ms-2" style="transition:transform 0.2s;"></i>
+  </button>
+
+  <!-- Filters (Collapsible) -->
+  <div id="filterSection" class="collapse">
+    <form method="get" class="row g-2 mb-4 align-items-end" style="background:#f8fafc; padding:15px; border-radius:10px; margin-left:-15px; margin-right:-15px; padding-left:15px; padding-right:15px; width:calc(100% + 30px);">
+      <div class="col-12 col-md-3">
+        <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#475569;">Statut</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">Tous les statuts</option>
+          <option value="BLANK" {% if "BLANK" in status_filter %}selected{% endif %}>Vide</option>
+          <option value="ACTIVE" {% if "ACTIVE" in status_filter %}selected{% endif %}>Actif</option>
+          <option value="USED" {% if "USED" in status_filter %}selected{% endif %}>Consommé</option>
+          <option value="EXPIRED" {% if "EXPIRED" in status_filter %}selected{% endif %}>Expiré</option>
+          <option value="CANCELLED" {% if "CANCELLED" in status_filter %}selected{% endif %}>Annulé</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#475569;">Nom de l'acheteur</label>
+        <input type="text" name="buyer" class="form-control form-control-sm" placeholder="Rechercher..."
+          value="{{ buyer_filter }}">
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label" style="font-size:0.8rem; font-weight:600; color:#475569;">Bénéficiaire</label>
+        <input type="text" name="beneficiary" class="form-control form-control-sm" placeholder="Rechercher..."
+          value="{{ beneficiary_filter }}">
+      </div>
+      <div class="col-12 col-md-3">
+        <button type="submit" class="btn btn-primary btn-sm w-100"
+          style="background:#2563eb; border-radius:6px;">Filtrer</button>
+      </div>
+    </form>
+  </div>
+
+  {% if vouchers %}
+  <!-- Desktop Table View -->
+  <div class="table-responsive d-none d-md-block">
+    <table class="table table-hover align-middle" style="font-size:0.88rem;">
+      <thead style="color:#64748b; font-size:0.8rem; text-transform:uppercase; font-weight:600;">
+        <tr>
+          {% if user.is_admin %}<th>Magasin</th>{% endif %}
+          <th>Client / Bénéficiaire</th>
+          <th>Valeur initiale</th>
+          <th>Consommé</th>
+          <th>Solde restant</th>
+          <th>Dernière modif.</th>
+          <th>Par</th>
+          <th>Statut</th>
+          {% if not user.is_caissier %}<th></th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in vouchers %}
+        <tr>
+          {% if user.is_admin %}<td style="font-size:0.83rem; color:#475569;">{{ v.store.name }}</td>{% endif %}
+          <td>
+            <div class="fw-500" style="color:#0f172a; font-size:0.88rem;">{{ v.customer_name|default:"—" }}</div>
+            {% if v.beneficiary_name %}
+            <div style="font-size:0.77rem; color:#64748b;">
+              <i class="bi bi-arrow-right-short"></i>{{ v.beneficiary_name }}
+            </div>
+            {% endif %}
+          </td>
+          <td style="color:#2563eb; font-weight:600;">{{ v.value }} DA</td>
+          <td style="color:#0f172a; font-weight:600;">{{ v.consumed_amount }} DA</td>
+          <td>
+            <div style="font-weight:600; color:{% if v.remaining_value == 0 %}#dc2626{% else %}#16a34a{% endif %};">
+              {{ v.remaining_value }} DA
+            </div>
+            {% if v.value > 0 and v.status == 'ACTIVE' %}
+            <div
+              style="background:#f1f5f9; border-radius:4px; height:5px; width:80px; margin-top:4px; overflow:hidden;">
+              <div style="background:#16a34a; height:100%; width:{% widthratio v.remaining_value v.value 100 %}%;">
+              </div>
+            </div>
+            {% endif %}
+          </td>
+          <td style="color:#64748b; font-size:0.75rem;">
+            {{ v.updated_at|date:"d/m/Y H:i" }}
+          </td>
+          <td style="color:#64748b; font-size:0.75rem;">
+            {{ v.updated_by.username|default:"—" }}
+          </td>
+          <td>
+            {% if v.status == 'BLANK' %}
+            <span class="badge"
+              style="background:#e0e7ff; color:#4f46e5; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Vide</span>
+            {% elif v.status == 'ACTIVE' %}
+            <span class="badge"
+              style="background:#dcfce7; color:#16a34a; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Actif</span>
+            {% elif v.status == 'USED' %}
+            <span class="badge"
+              style="background:#f1f5f9; color:#475569; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Consommé</span>
+            {% elif v.status == 'EXPIRED' %}
+            <span class="badge"
+              style="background:#fef3c7; color:#d97706; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Expiré</span>
+            {% else %}
+            <span class="badge"
+              style="background:#fee2e2; color:#dc2626; border-radius:6px; font-size:0.75rem; padding:4px 10px;">Annulé</span>
+            {% endif %}
+          </td>
+          {% if not user.is_caissier %}
+          <td>
+            <a href="{% url 'voucher_detail' v.pk %}" class="btn btn-sm" style="color:#2563eb; font-size:0.8rem;"
+              title="Voir">
+              <i class="bi bi-eye"></i>
+            </a>
+            {% if user.is_manager %}
+            {% if v.status == 'BLANK' %}
+            <a href="{% url 'voucher_fill' v.pk %}" class="btn btn-sm"
+              style="color:#4f46e5; font-size:0.8rem; font-weight:600;" title="Activer">
+              <i class="bi bi-pencil-square"></i>
+            </a>
+            {% elif v.status == 'ACTIVE' %}
+            <a href="{% url 'voucher_redeem' v.pk %}" class="btn btn-sm"
+              style="color:#f59e0b; font-size:0.8rem; font-weight:600;" title="Consommer">
+              <i class="bi bi-cash-coin"></i>
+            </a>
+            {% endif %}
+            {% endif %}
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card View -->
+  <div class="d-md-none">
+    <div class="row g-2">
+      {% for v in vouchers %}
+      <div class="col-12">
+        <a href="{% url 'voucher_detail' v.pk %}" style="text-decoration:none;">
+          <div class="p-2 rounded-3" style="background:#f8fafc; border:1px solid #e2e8f0; transition:all 0.2s; cursor:pointer;" onmouseover="this.style.background='#f1f5f9'; this.style.borderColor='#cbd5e1';" onmouseout="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0';">
+            <!-- Header: Customer & Status -->
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <div class="fw-600" style="color:#0f172a; font-size:0.85rem;">{{ v.customer_name|default:"—" }}</div>
+                {% if v.beneficiary_name %}
+                <div style="font-size:0.7rem; color:#64748b;">
+                  <i class="bi bi-arrow-right-short"></i>{{ v.beneficiary_name|truncatechars:20 }}
+                </div>
+                {% endif %}
+              </div>
+              {% if v.status == 'BLANK' %}
+              <span class="badge" style="background:#e0e7ff; color:#4f46e5; border-radius:4px; font-size:0.65rem; padding:2px 6px;">Vide</span>
+              {% elif v.status == 'ACTIVE' %}
+              <span class="badge" style="background:#dcfce7; color:#16a34a; border-radius:4px; font-size:0.65rem; padding:2px 6px;">Actif</span>
+              {% elif v.status == 'USED' %}
+              <span class="badge" style="background:#f1f5f9; color:#475569; border-radius:4px; font-size:0.65rem; padding:2px 6px;">Consommé</span>
+              {% elif v.status == 'EXPIRED' %}
+              <span class="badge" style="background:#fef3c7; color:#d97706; border-radius:4px; font-size:0.65rem; padding:2px 6px;">Expiré</span>
+              {% else %}
+              <span class="badge" style="background:#fee2e2; color:#dc2626; border-radius:4px; font-size:0.65rem; padding:2px 6px;">Annulé</span>
+              {% endif %}
+            </div>
+
+            <!-- Values Row -->
+            <div class="row g-2 mb-2" style="font-size:0.75rem;">
+              <div class="col-4">
+                <div style="color:#94a3b8; font-weight:600; font-size:0.65rem; text-transform:uppercase;">Valeur</div>
+                <div class="fw-600" style="font-size:0.9rem; color:#2563eb;">{{ v.value }} DA</div>
+              </div>
+              <div class="col-4">
+                <div style="color:#94a3b8; font-weight:600; font-size:0.65rem; text-transform:uppercase;">Consommé</div>
+                <div class="fw-600" style="font-size:0.9rem; color:#0f172a;">{{ v.consumed_amount }} DA</div>
+              </div>
+              <div class="col-4">
+                <div style="color:#94a3b8; font-weight:600; font-size:0.65rem; text-transform:uppercase;">Restant</div>
+                <div class="fw-600" style="font-size:0.9rem; color:{% if v.remaining_value == 0 %}#dc2626{% else %}#16a34a{% endif %};">{{ v.remaining_value }} DA</div>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            {% if v.value > 0 and v.status == 'ACTIVE' %}
+            <div style="background:#f1f5f9; border-radius:4px; height:4px; margin-bottom:2px; overflow:hidden;">
+              <div style="background:linear-gradient(90deg,#16a34a,#22c55e); height:100%; width:{% widthratio v.remaining_value v.value 100 %}%;"></div>
+            </div>
+            <small class="text-muted" style="font-size:0.65rem;">{% widthratio v.remaining_value v.value 100 %}% restant</small>
+            {% endif %}
+
+            <!-- Meta Info -->
+            <div class="mt-2 pt-2 border-top" style="border-color:#e2e8f0; font-size:0.65rem; color:#94a3b8; line-height:1.3;">
+              <div><span class="fw-600">Mod:</span> {{ v.updated_at|date:"d/m H:i" }} <span class="fw-600 ms-2">Par:</span> {{ v.updated_by.username|default:"—" }}</div>
+              {% if user.is_admin and v.store %}
+              <div><span class="fw-600">Magasin:</span> {{ v.store.name|truncatechars:15 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {% if vouchers.has_other_pages %}
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination pagination-sm justify-content-center">
+      {% if vouchers.has_previous %}
+      <li class="page-item"><a class="page-link"
+          href="?page={{ vouchers.previous_page_number }}&status={{ status_filter|urlencode }}&buyer={{ buyer_filter|urlencode }}&beneficiary={{ beneficiary_filter|urlencode }}"
+          style="color:#2563eb;">Précédent</a></li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link">Précédent</span></li>
+      {% endif %}
+
+      <li class="page-item disabled"><span class="page-link" style="background:#f1f5f9; color:#475569;">Page {{
+          vouchers.number }} sur {{ vouchers.paginator.num_pages }}</span></li>
+
+      {% if vouchers.has_next %}
+      <li class="page-item"><a class="page-link"
+          href="?page={{ vouchers.next_page_number }}&status={{ status_filter|urlencode }}&buyer={{ buyer_filter|urlencode }}&beneficiary={{ beneficiary_filter|urlencode }}"
+          style="color:#2563eb;">Suivant</a></li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link">Suivant</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-ticket fs-1 d-block mb-2" style="opacity:0.3;"></i>
+    Aucun voucher actif.<br>
+    {% if user.is_manager %}
+    <a href="{% url 'voucher_request_create' %}" class="mt-2 d-inline-block">Faire une demande</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

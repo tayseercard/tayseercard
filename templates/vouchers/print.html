@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Imprimer — {{ voucher.title }}{% endblock %}
+{% block page_title %}Aperçu impression{% endblock %}
+
+{% block extra_css %}
+<style>
+  .print-voucher {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 420px;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+  .voucher-store { font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; }
+  .voucher-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin: 8px 0; }
+  .voucher-value {
+    font-size: 2.5rem; font-weight: 800; color: #2563eb;
+    background: #dbeafe; border-radius: 12px;
+    padding: 10px 24px; display: inline-block; margin: 12px 0;
+  }
+  .voucher-qr img { width: 200px; height: 200px; border-radius: 12px; border: 4px solid #f1f5f9; }
+  .voucher-code { font-family: monospace; font-size: 0.72rem; color: #94a3b8; margin-top: 8px; }
+  .voucher-divider {
+    border: none; border-top: 2px dashed #e2e8f0; margin: 20px 0;
+  }
+  .voucher-footer { font-size: 0.78rem; color: #94a3b8; }
+
+  @media print {
+    body * { visibility: hidden; }
+    .print-voucher, .print-voucher * { visibility: visible; }
+    .print-voucher { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); box-shadow: none; border: 2px solid #000; }
+    .no-print { display: none !important; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="no-print mb-3 d-flex gap-2 justify-content-center">
+  <button onclick="window.print()" class="btn" style="background:#2563eb; color:#fff; border-radius:10px;">
+    <i class="bi bi-printer me-2"></i>Imprimer
+  </button>
+  <a href="{% url 'voucher_detail' voucher.pk %}" class="btn" style="background:#f1f5f9; color:#475569; border-radius:10px;">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
+</div>
+
+<div class="print-voucher">
+  <div class="voucher-store">{{ voucher.store.name }}</div>
+  <div class="voucher-title">{{ voucher.title }}</div>
+
+  {% if voucher.description %}
+  <p style="color:#64748b; font-size:0.85rem; margin-bottom:8px;">{{ voucher.description }}</p>
+  {% endif %}
+
+  <div class="voucher-value">{{ voucher.value }} DZD</div>
+
+  <hr class="voucher-divider"/>
+
+  <div class="voucher-qr">
+    {% if voucher.qr_image %}
+      <img src="{{ voucher.qr_image.url }}" alt="QR Code {{ voucher.title }}"/>
+    {% endif %}
+  </div>
+  <div class="voucher-code">{{ voucher.code }}</div>
+
+  <hr class="voucher-divider"/>
+
+  <div class="voucher-footer">
+    {% if voucher.expires_at %}
+    Expire le {{ voucher.expires_at|date:"d/m/Y" }}<br/>
+    {% endif %}
+    Valeur nominale : {{ voucher.value }} DZD · Prix : {{ voucher.price }} DZD
+  </div>
+</div>
+{% endblock %}

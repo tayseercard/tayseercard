@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block title %}Ajouter un magasin{% endblock %}
+{% block nav_stores %}active{% endblock %}
+{% block page_title %}Ajouter un magasin{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.88rem;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .form-control, .form-select {
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .stat-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    height: 100%;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .section-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+  }
+
+  .btn-submit {
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-submit:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  }
+
+  .btn-cancel {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-cancel:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{% url 'store_list' %}" class="btn-cancel" style="padding: 8px 16px; font-size: 0.88rem;">
+    <i class="bi bi-arrow-left"></i> Retour aux magasins
+  </a>
+</div>
+
+<form method="post" autocomplete="off">
+  {% csrf_token %}
+  
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger mb-4">
+    {% for error in form.non_field_errors %}
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ error }}</span>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <!-- Store Details Column -->
+    <div class="col-lg-6">
+      <div class="stat-card">
+        <div class="section-header">
+          <div class="section-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+            <i class="bi bi-shop"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 fw-700" style="color: #0f172a; font-size: 1.1rem;">Informations du Magasin</h5>
+            <p class="text-muted mb-0" style="font-size: 0.8rem;">Détails de l'établissement et contact.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.store_name.id_for_label }}">Nom du magasin</label>
+          {{ form.store_name }}
+          {% if form.store_name.errors %}
+            <div class="text-danger mt-1 fw-500" style="font-size: 0.8rem;">
+              <i class="bi bi-exclamation-circle me-1"></i>{{ form.store_name.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.phone.id_for_label }}">Téléphone du magasin</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}
+            <div class="text-danger mt-1 fw-500" style="font-size: 0.8rem;">
+              <i class="bi bi-exclamation-circle me-1"></i>{{ form.phone.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.address.id_for_label }}">Adresse complète</label>
+          {{ form.address }}
+          {% if form.address.errors %}
+            <div class="text-danger mt-1 fw-500" style="font-size: 0.8rem;">
+              <i class="bi bi-exclamation-circle me-1"></i>{{ form.address.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.description.id_for_label }}">Description (optionnel)</label>
+          {{ form.description }}
+          {% if form.description.errors %}
+            <div class="text-danger mt-1 fw-500" style="font-size: 0.8rem;">
+              <i class="bi bi-exclamation-circle me-1"></i>{{ form.description.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Manager Account Column -->
+    <div class="col-lg-6">
+      <div class="stat-card">
+        <div class="section-header">
+          <div class="section-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+            <i class="bi bi-person-badge"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 fw-700" style="color: #0f172a; font-size: 1.1rem;">Compte du Gérant</h5>
+            <p class="text-muted mb-0" style="font-size: 0.8rem;">Identifiants de connexion pour le manager.</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 form-group">
+            <label class="form-label" for="{{ form.manager_first_name.id_for_label }}">Prénom</label>
+            {{ form.manager_first_name }}
+            {% if form.manager_first_name.errors %}
+              <div class="text-danger mt-1 fw-500" style="font-size: 0.8rem;">
+                <i class="bi bi-exclamation-circle me-1"></i>{{ form.manager_first_name.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+          <div class="col-md-6 form-group">
+            <label class="form-label" for="{{ form.manager_last_name.id_for_label }}">Nom</label>
+            {{ form.manager_last_name }}
+            {% if form.manager_last_name.errors %}
+              <div class="text-danger mt-1 fw-500" style="font-size: 0.8rem;">
+                <i class="bi bi-exclamation-circle me-1"></i>{{ form.manager_last_name.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="text-danger mt-1 fw-500" style="font-size: 0.8rem;">
+              <i class="bi bi-exclamation-circle me-1"></i>{{ form.email.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 form-group">
+            <label class="form-label" for="{{ form.password.id_for_label }}">Mot de passe</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+              <div class="text-danger mt-1 fw-500" style="font-size: 0.8rem;">
+                <i class="bi bi-exclamation-circle me-1"></i>{{ form.password.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+          <div class="col-md-6 form-group">
+            <label class="form-label" for="{{ form.password_confirm.id_for_label }}">Confirmer mot de passe</label>
+            {{ form.password_confirm }}
+            {% if form.password_confirm.errors %}
+              <div class="text-danger mt-1 fw-500" style="font-size: 0.8rem;">
+                <i class="bi bi-exclamation-circle me-1"></i>{{ form.password_confirm.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end gap-3 mt-4">
+    <a href="{% url 'store_list' %}" class="btn-cancel">Annuler</a>
+    <button type="submit" class="btn-submit">
+      <i class="bi bi-check-lg"></i> Créer le magasin
+    </button>
+  </div>
+</form>
+{% endblock %}

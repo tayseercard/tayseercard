@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Demande — {{ vr.title }}{% endblock %}
+{% block nav_admin_requests %}active{% endblock %}
+{% block page_title %}Examiner la demande{% endblock %}
+
+{% block content %}
+<style>
+  .nav-link.btn-tab-approve.active {
+    background: #16a34a !important;
+    color: #fff !important;
+  }
+  .nav-link.btn-tab-approve:not(.active) {
+    background: transparent !important;
+    color: #16a34a !important;
+  }
+  .nav-link.btn-tab-reject.active {
+    background: #dc2626 !important;
+    color: #fff !important;
+  }
+  .nav-link.btn-tab-reject:not(.active) {
+    background: transparent !important;
+    color: #dc2626 !important;
+  }
+</style>
+
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6 col-xl-5">
+    <div class="stat-card mb-4" style="border-radius:16px; padding:28px;">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-3">
+          <div style="width:48px; height:48px; background:rgba(37,99,235,0.1); color:#2563eb; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem;">
+            <i class="bi bi-ticket-perforated"></i>
+          </div>
+          <div>
+            <h5 class="fw-700 mb-0" style="color:#0f172a; font-size:1.1rem; line-height:1.2;">{{ vr.title }}</h5>
+            <span style="font-size:0.75rem; color:#64748b;">
+              <i class="bi bi-shop me-1"></i>{{ vr.store.name }}
+            </span>
+          </div>
+        </div>
+        <span class="badge" style="background:{% if vr.status == 'PENDING' %}#fef3c7{% elif vr.status == 'APPROVED' %}#dcfce7{% else %}#fee2e2{% endif %}; color:{% if vr.status == 'PENDING' %}#b45309{% elif vr.status == 'APPROVED' %}#166534{% else %}#b91c1c{% endif %}; border-radius:8px; padding:6px 12px; font-weight:600; font-size:0.78rem;">
+          {{ vr.get_status_display }}
+        </span>
+      </div>
+
+      <hr style="border-color:#f1f5f9; margin: 0 -28px 20px -28px;">
+
+      <!-- Coordonnées du Magasin -->
+      <div class="mb-3">
+        <h6 class="fw-700 text-muted text-uppercase mb-2" style="font-size:0.7rem; letter-spacing:0.05em;">Coordonnées du commerce</h6>
+        <div class="p-3 rounded-3" style="background:#f8fafc; border:1px solid #f1f5f9; font-size:0.85rem; color:#475569;">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-geo-alt text-muted" style="font-size:0.95rem;"></i>
+            <span><strong>Adresse:</strong> {{ vr.store.address|default:"Non spécifiée" }}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-telephone text-muted" style="font-size:0.95rem;"></i>
+            <span><strong>Téléphone:</strong> {{ vr.store.phone|default:"Non spécifié" }}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-envelope text-muted" style="font-size:0.95rem;"></i>
+            <span><strong>Email du gérant:</strong> {{ vr.store.manager.email }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="mb-4">
+        <h6 class="fw-700 text-muted text-uppercase mb-2" style="font-size:0.7rem; letter-spacing:0.05em;">Détails de la demande</h6>
+        <div class="p-3 rounded-3" style="background:#f8fafc; border:1px solid #f1f5f9; font-size:0.88rem;">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Prix unitaire</span>
+            <span class="fw-600 text-dark">{{ vr.price }} DZD</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Quantité</span>
+            <span class="fw-600 text-dark">{{ vr.quantity }}</span>
+          </div>
+          <hr style="border-color:#e2e8f0; margin: 10px 0;">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-700 text-dark" style="font-size:0.9rem;">Total</span>
+            <span class="fw-700 text-primary" style="font-size:1.1rem;">{{ vr.total_amount }} DZD</span>
+          </div>
+          {% if vr.description %}
+          <div class="border-top pt-2 mt-2" style="border-color:#f1f5f9 !important;">
+            <span class="text-muted small d-block" style="font-size:0.75rem;">Description</span>
+            <span class="fw-500" style="color:#475569;">{{ vr.description }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Action Section -->
+      {% if vr.status == 'PENDING' %}
+      <div class="pt-3 border-top" style="border-color:#f1f5f9 !important;">
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 mb-2">
+          <!-- Approve Button (Direct POST Form) -->
+          <form method="post" action="{% url 'admin_request_approve' vr.pk %}" class="w-50 mb-0">
+            {% csrf_token %}
+            <button type="submit" class="btn w-100 d-flex align-items-center justify-content-center gap-1.5" style="background:#16a34a; color:#fff; border-radius:10px; padding:11px; font-weight:600; border:none; font-size: 0.9rem; transition: background 0.2s;">
+              <i class="bi bi-check-circle"></i> Approuver et générer
+            </button>
+          </form>
+
+          <!-- Reject Toggle Button -->
+          <button class="btn w-50 d-flex align-items-center justify-content-center gap-1.5" type="button" data-bs-toggle="collapse" data-bs-target="#rejectFormCollapse" aria-expanded="false" aria-controls="rejectFormCollapse" style="background:transparent; color:#dc2626; border: 1.5px solid #dc2626; border-radius:10px; padding:10px; font-weight:600; font-size: 0.9rem; transition: all 0.2s;">
+            <i class="bi bi-x-circle"></i> Rejeter
+          </button>
+        </div>
+
+        <!-- Info alert for expiration -->
+        <div class="text-center mb-1">
+          <small class="text-muted" style="font-size:0.75rem;">
+            <i class="bi bi-info-circle me-1"></i> Les bons seront valables <strong>6 mois</strong> à partir de la date d'approbation.
+          </small>
+        </div>
+
+        <!-- Collapsible Rejection Form -->
+        <div class="collapse" id="rejectFormCollapse">
+          <div class="p-3 rounded-3 mt-2" style="background:#fef2f2; border:1px solid #fee2e2;">
+            <form method="post" action="{% url 'admin_request_reject' vr.pk %}" class="mb-0">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label fw-600 text-danger" style="font-size:0.8rem;">Raison du rejet</label>
+                <textarea name="reason" class="form-control" rows="2" placeholder="Expliquez brièvement la raison..." style="border-radius:8px; border-color:#fecaca; font-size: 0.88rem;" required></textarea>
+              </div>
+              <button type="submit" class="btn w-100" style="background:#dc2626; color:#fff; border-radius:10px; padding:11px; font-weight:600; border:none; font-size: 0.9rem;">
+                Confirmer le rejet
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="alert mb-0 text-center" style="border-radius:10px; background:#f1f5f9; color:#475569; font-size:0.82rem; font-weight:500; border:none; padding:12px;">
+        <i class="bi bi-info-circle me-1"></i> Traitée le {{ vr.reviewed_at|date:"d/m/Y à H:i" }} par {{ vr.reviewed_by.username }}.
+        {% if vr.rejection_reason %}<br><strong>Raison de rejet :</strong> {{ vr.rejection_reason }}{% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center">
+      <a href="{% url 'admin_request_list' %}" class="btn d-inline-flex align-items-center gap-2" style="background:#f1f5f9; color:#475569; border-radius:10px; font-weight:600; font-size:0.85rem; padding:10px 18px; text-decoration:none; transition:all 0.2s;">
+        <i class="bi bi-arrow-left"></i> Retour aux demandes
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

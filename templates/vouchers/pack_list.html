@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Offres & Packs{% endblock %}
+{% block page_title %}Offres &amp; Packs{% endblock %}
+{% block nav_packs %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <p class="text-muted mb-0" style="font-size:0.88rem;">Gérez les packs de vouchers proposés aux magasins.</p>
+    </div>
+    <a href="{% url 'pack_create' %}" class="btn"
+        style="background:#7c3aed; color:#fff; border-radius:10px; padding:9px 20px; font-weight:500;">
+        <i class="bi bi-plus-circle me-2"></i>Nouveau pack
+    </a>
+</div>
+
+{% if packs %}
+<div class="row g-3">
+    {% for pack in packs %}
+    <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="stat-card h-100"
+            style="border:2px solid {% if pack.is_active %}#e0e7ff{% else %}#f1f5f9{% endif %}; position:relative; {% if not pack.is_active %}opacity:0.65;{% endif %}">
+            {% if not pack.is_active %}
+            <span
+                style="position:absolute; top:12px; right:12px; background:#f1f5f9; color:#94a3b8; font-size:0.65rem; font-weight:700; padding:3px 10px; border-radius:20px;">INACTIF</span>
+            {% endif %}
+
+            <div
+                style="font-size:0.7rem; color:#7c3aed; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">
+                <i class="bi bi-qr-code me-1"></i>{{ pack.pack_quantity }} QR Code{{ pack.pack_quantity|pluralize }}
+            </div>
+
+            <h6 class="fw-700" style="color:#0f172a; margin-bottom:4px;">{{ pack.title }}</h6>
+
+            <div style="font-size:1.6rem; font-weight:800; color:#7c3aed; line-height:1.1; margin: 10px 0 4px;">
+                {{ pack.price|floatformat:0 }} <span style="font-size:0.9rem; font-weight:500; color:#94a3b8;">DA</span>
+            </div>
+            <div style="font-size:0.78rem; color:#64748b; margin-bottom:10px;">{{ pack.pack_quantity }} bons inclus
+            </div>
+
+            {% if pack.description %}
+            <div
+                style="font-size:0.78rem; color:#94a3b8; background:#f8fafc; border-radius:8px; padding:8px 10px; margin-bottom:12px; font-style:italic;">
+                {{ pack.description|truncatechars:100 }}
+            </div>
+            {% endif %}
+
+            <div class="d-flex gap-2">
+                <a href="{% url 'pack_edit' pack.pk %}" class="btn btn-sm flex-fill"
+                    style="background:#f1f5f9; color:#475569; border-radius:8px; font-size:0.8rem;">
+                    <i class="bi bi-pencil me-1"></i>Modifier
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="stat-card text-center py-5">
+    <i class="bi bi-box-seam fs-1 d-block mb-3" style="color:#7c3aed; opacity:0.4;"></i>
+    <div class="fw-600" style="color:#0f172a;">Aucun pack défini</div>
+    <p class="text-muted" style="font-size:0.85rem;">Créez votre premier pack pour que les magasins puissent faire des
+        demandes.</p>
+    <a href="{% url 'pack_create' %}" class="btn mt-2" style="background:#7c3aed; color:#fff; border-radius:10px;">
+        <i class="bi bi-plus-circle me-2"></i>Créer un pack
+    </a>
+</div>
+{% endif %}
+{% endblock %}

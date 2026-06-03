@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Demandes vouchers{% endblock %}
+{% block nav_admin_requests %}active{% endblock %}
+{% block page_title %}Demandes de vouchers{% endblock %}
+
+{% block content %}
+<!-- Filter tabs -->
+<div class="d-flex gap-2 mb-4">
+  <a href="?status=PENDING" class="btn btn-sm {% if status_filter == 'PENDING' %}active{% endif %}"
+     style="border-radius:20px; {% if status_filter == 'PENDING' %}background:#2563eb; color:#fff;{% else %}background:#f1f5f9; color:#475569;{% endif %}">
+    <i class="bi bi-clock me-1"></i>En attente
+  </a>
+  <a href="?status=APPROVED" class="btn btn-sm {% if status_filter == 'APPROVED' %}active{% endif %}"
+     style="border-radius:20px; {% if status_filter == 'APPROVED' %}background:#16a34a; color:#fff;{% else %}background:#f1f5f9; color:#475569;{% endif %}">
+    <i class="bi bi-check-circle me-1"></i>Approuvées
+  </a>
+  <a href="?status=REJECTED" class="btn btn-sm {% if status_filter == 'REJECTED' %}active{% endif %}"
+     style="border-radius:20px; {% if status_filter == 'REJECTED' %}background:#dc2626; color:#fff;{% else %}background:#f1f5f9; color:#475569;{% endif %}">
+    <i class="bi bi-x-circle me-1"></i>Rejetées
+  </a>
+</div>
+
+<div class="stat-card">
+  {% if requests %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle" style="font-size:0.88rem;">
+      <thead style="color:#64748b;">
+        <tr>
+          <th>Magasin</th>
+          <th>Titre</th>
+          <th>Valeur</th>
+          <th>Qté</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in requests %}
+        <tr>
+          <td>
+            <div class="fw-500">{{ r.store.name }}</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">{{ r.requested_by.username }}</div>
+          </td>
+          <td>{{ r.title }}</td>
+          <td>{{ r.value }} DZD</td>
+          <td>{{ r.quantity }}</td>
+          <td style="color:#64748b;">{{ r.created_at|date:"d/m/Y H:i" }}</td>
+          <td>
+            <a href="{% url 'admin_request_detail' r.pk %}" class="btn btn-sm" style="background:#2563eb; color:#fff; border-radius:8px; font-size:0.8rem;">
+              <i class="bi bi-eye me-1"></i>Examiner
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-inbox fs-1 d-block mb-2" style="opacity:0.3;"></i>
+    Aucune demande {{ status_filter|lower }}.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,572 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tayseer Card | Votre Solution de Vouchers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --accent: #f59e0b;
+            --bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Hero Background Blob */
+        .hero-blob {
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0) 70%);
+            z-index: -1;
+            filter: blur(80px);
+            animation: animateBlob 20s infinite alternate;
+        }
+
+        @keyframes animateBlob {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(-10%, 10%) scale(1.1);
+            }
+        }
+
+        /* Navbar */
+        .navbar {
+            padding: 20px 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.7) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            padding: 10px 0;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: #0f172a !important;
+            letter-spacing: -0.04em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            color: white;
+            background: var(--primary);
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: #4A4A4A !important;
+            margin: 0 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .nav-link:hover::after {
+            width: 20px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary) !important;
+        }
+
+        .btn-primary-custom {
+            background: var(--primary);
+            color: white !important;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 16px;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-outline-custom {
+            border: 2px solid #F0F3FF;
+            background: #F0F3FF;
+            color: var(--primary) !important;
+            padding: 10px 26px;
+            border-radius: 16px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-custom:hover {
+            background: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 160px 0 100px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-weight: 800;
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.04em;
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* Cards and Sections */
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .section-title p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+        }
+
+        /* Pricing Card */
+        .pricing-card {
+            background: #fff;
+            border-radius: 30px;
+            padding: 48px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .pricing-card.premium {
+            border: 2px solid var(--primary);
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+        }
+
+        .pricing-card .badge-popular {
+            position: absolute;
+            top: 24px;
+            right: -32px;
+            background: var(--primary);
+            color: white;
+            padding: 8px 40px;
+            transform: rotate(45deg);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .price-tag {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .price-tag span {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-left: 4px;
+            font-weight: 500;
+        }
+
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 32px 0;
+            flex-grow: 1;
+        }
+
+        .pricing-features li {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+        }
+
+        .pricing-features li i {
+            color: #16a34a;
+            margin-right: 12px;
+        }
+
+        /* Footer */
+        footer {
+            background: #0f172a;
+            color: white;
+            padding: 80px 0 40px;
+        }
+
+        .footer-logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 24px;
+            display: block;
+            text-decoration: none;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        @media (max-width: 991px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .pricing-card.premium {
+                transform: none;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero-blob"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top" id="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-wallet2 me-2"></i>TAYSEER CARD
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#a-propos">À propos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tarifs">Tarifs</a>
+                    </li>
+                    <li class="nav-item ms-lg-4">
+                        <a class="btn btn-outline-custom" href="{% url 'login' %}">Connexion</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-primary-custom" href="{% url 'store_signup' %}">Rejoignez-nous</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <h1>Gérez vos <span>Vouchers</span> en toute simplicité.</h1>
+                    <p>La plateforme officielle de gestion de bons d'achat et services prépayés. Sécurité, rapidité et
+                        transparence pour tous vos besoins.</p>
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'login' %}" class="btn btn-primary-custom btn-lg">Accéder au Dashboard</a>
+                        <a href="{% url 'store_signup' %}" class="btn btn-outline-custom btn-lg">Rejoignez-nous</a>
+                    </div>
+                    <div class="mt-5 d-flex gap-4 align-items-center">
+                        <div class="d-flex -space-x-2">
+                            <i class="bi bi-shield-check text-primary fs-4"></i>
+                            <span class="ms-2 fw-500">Sécurisé & Certifié</span>
+                        </div>
+                        <div class="d-flex -space-x-2">
+                            <i class="bi bi-lightning-charge text-warning fs-4"></i>
+                            <span class="ms-2 fw-500">Activation instantanée</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-block">
+                    <img src="https://img.freepik.com/free-vector/digital-wallet-concept-illustration_114360-7561.jpg"
+                        alt="Tayseer Card" class="img-fluid rounded-5 shadow-lg">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section class="py-5" id="a-propos">
+        <div class="container py-5">
+            <div class="section-title">
+                <h2>Pourquoi choisir Tayseer Card ?</h2>
+                <p>Une solution pensée pour les entreprises et les particuliers désirant simplifier leurs transactions.
+                </p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-qr-code"></i>
+                        </div>
+                        <h3>Scan Rapide</h3>
+                        <p>Validez vos vouchers en un clin d'œil via notre interface de scan optimisée.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h3>Suivi en Temps Réel</h3>
+                        <p>Consultez l'historique complet des modifications et des consommations instantanément.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-printer"></i>
+                        </div>
+                        <h3>Impression Facile</h3>
+                        <p>Générez et imprimez vos vouchers en masse avec des designs professionnels.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="py-5 bg-light" id="tarifs">
+        <div class="container py-5">
+            <div class="section-title">
+                <h2>Nos Offres & Packs</h2>
+                <p>Des tarifs adaptés à vos besoins, du démarrage à la croissance.</p>
+            </div>
+            <div class="row g-4 justify-content-center">
+                {% if packs %}
+                {% for pack in packs %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="pricing-card {% if forloop.counter == 2 %}premium{% endif %}">
+                        {% if forloop.counter == 2 %}
+                        <div class="badge-popular">Populaire</div>
+                        {% endif %}
+                        <h4 class="mb-3">{{ pack.title }}</h4>
+                        <div class="price-tag">
+                            {{ pack.price|floatformat:0 }}<span>DA</span>
+                        </div>
+                        <p class="text-muted mb-4">{{ pack.pack_quantity }} Vouchers inclus</p>
+
+                        <ul class="pricing-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Accès au Dashboard</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Support technique 24/7</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Historique illimité</li>
+                            <li><i class="bi bi-check-circle-fill"></i> API d'intégration</li>
+                        </ul>
+
+                        <a href="#contact"
+                            class="btn {% if forloop.counter == 2 %}btn-primary-custom{% else %}btn-outline-custom{% endif %} w-100">Choisir
+                            ce pack</a>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">Contactez-nous pour une offre personnalisée.</p>
+                    <a href="#contact" class="btn btn-primary-custom">Nous contacter</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <a href="#" class="footer-logo">TAYSEER CARD</a>
+                    <p style="color: #94a3b8;">La solution leader pour la gestion et la vente de vouchers en Algérie.
+                    </p>
+                    <div class="d-flex gap-3 mt-4">
+                        <a href="#" class="text-white fs-4"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 ms-lg-auto">
+                    <h5>Plateforme</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'login' %}">Connexion</a></li>
+                        <li><a href="#a-propos">Fonctionnalités</a></li>
+                        <li><a href="#tarifs">Offres</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2">
+                    <h5>Aide</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h5>Contact</h5>
+                    <ul class="footer-links">
+                        <li><i class="bi bi-envelope me-2"></i> contact@tayseercard.com</li>
+                        <li><i class="bi bi-geo-alt me-2"></i> Alger, Algérie</li>
+                        <li><i class="bi bi-telephone me-2"></i> +213 (0) 555 00 00 00</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-5" style="border-color: #334155;">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0" style="color: #64748b;">&copy; 2026 Tayseer Card. Tous droits réservés.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <a href="#" class="text-decoration-none small me-3" style="color: #64748b;">Politique de
+                        confidentialité</a>
+                    <a href="#" class="text-decoration-none small" style="color: #64748b;">Conditions générales</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function checkScroll() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
+
+        window.addEventListener('scroll', checkScroll);
+        window.addEventListener('load', checkScroll);
+    </script>
+</body>
+
+</html>

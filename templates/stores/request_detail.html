@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Demande partenaire — {{ request_item.store_name }}{% endblock %}
+{% block nav_store_requests %}active{% endblock %}
+{% block page_title %}Demande de partenariat{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6 col-xl-5">
+    <div class="stat-card mb-4" style="border-radius:16px; padding:28px;">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-3">
+          <div style="width:48px; height:48px; background:rgba(37,99,235,0.1); color:#2563eb; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem;">
+            <i class="bi bi-shop"></i>
+          </div>
+          <div>
+            <h5 class="fw-700 mb-0" style="color:#0f172a; font-size:1.1rem; line-height:1.2;">{{ request_item.store_name }}</h5>
+            <span style="font-size:0.75rem; color:#64748b;">Reçue le {{ request_item.created_at|date:"d/m/Y à H:i" }}</span>
+          </div>
+        </div>
+        <span class="badge" style="background:{% if request_item.status == 'PENDING' %}#fef3c7{% elif request_item.status == 'APPROVED' %}#dcfce7{% else %}#fee2e2{% endif %}; color:{% if request_item.status == 'PENDING' %}#b45309{% elif request_item.status == 'APPROVED' %}#166534{% else %}#b91c1c{% endif %}; border-radius:8px; padding:6px 12px; font-weight:600; font-size:0.78rem;">
+          {{ request_item.get_status_display }}
+        </span>
+      </div>
+
+      <hr style="border-color:#f1f5f9; margin: 16px -28px 20px -28px;">
+
+      <!-- Details List -->
+      <div class="mb-4">
+        <!-- Gérant Section -->
+        <h6 class="fw-700 text-muted text-uppercase mb-2" style="font-size:0.7rem; letter-spacing:0.05em; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-person text-primary"></i> Coordonnées du Gérant
+        </h6>
+        <div class="p-3 rounded-3 mb-3" style="background:#f8fafc; border:1px solid #f1f5f9; font-size:0.88rem;">
+          <div class="mb-2">
+            <span class="text-muted small d-block" style="font-size:0.75rem;">Nom complet</span>
+            <span class="fw-600" style="color:#1e293b;">{{ request_item.full_name }}</span>
+          </div>
+          <div>
+            <span class="text-muted small d-block" style="font-size:0.75rem;">Adresse e-mail</span>
+            <span class="fw-600" style="color:#1e293b;">{{ request_item.email }}</span>
+          </div>
+        </div>
+
+        <!-- Magasin Section -->
+        <h6 class="fw-700 text-muted text-uppercase mb-2" style="font-size:0.7rem; letter-spacing:0.05em; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-info-circle text-primary"></i> Détails du Magasin
+        </h6>
+        <div class="p-3 rounded-3" style="background:#f8fafc; border:1px solid #f1f5f9; font-size:0.88rem;">
+          <div class="mb-2">
+            <span class="text-muted small d-block" style="font-size:0.75rem;">Nom de l'établissement</span>
+            <span class="fw-600" style="color:#1e293b;">{{ request_item.store_name }}</span>
+          </div>
+          <div>
+            <span class="text-muted small d-block" style="font-size:0.75rem;">Numéro de téléphone</span>
+            <span class="fw-600" style="color:#1e293b;">{{ request_item.phone|default:'Non renseigné' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Section -->
+      {% if request_item.status == 'PENDING' %}
+      <div class="pt-3 border-top" style="border-color:#f1f5f9 !important;">
+        <form method="post" class="mb-0">
+          {% csrf_token %}
+          <button type="submit" class="btn w-100 d-flex align-items-center justify-content-center gap-2" style="background:#16a34a; color:#fff; border-radius:10px; padding:12px; font-weight:600; font-size:0.9rem; border:none; transition:all 0.2s;">
+            <i class="bi bi-person-check-fill"></i> Activer le compte et approuver
+          </button>
+        </form>
+      </div>
+      {% else %}
+      <div class="alert mb-0 text-center" style="border-radius:10px; background:#f1f5f9; color:#475569; font-size:0.82rem; font-weight:500; border:none; padding:12px;">
+        <i class="bi bi-check-all text-success me-1 fs-5 align-middle"></i> Traitée le {{ request_item.reviewed_at|date:"d/m/Y à H:i" }} par {{ request_item.reviewed_by.get_full_name|default:request_item.reviewed_by.username }}.
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center">
+      <a href="{% url 'store_request_list' %}" class="btn d-inline-flex align-items-center gap-2" style="background:#f1f5f9; color:#475569; border-radius:10px; font-weight:600; font-size:0.85rem; padding:10px 18px; text-decoration:none; transition:all 0.2s;">
+        <i class="bi bi-arrow-left"></i> Retour aux demandes
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
