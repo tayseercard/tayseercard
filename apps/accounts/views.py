@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.db.models import Sum, F, Q
 from django.utils import timezone
 from .models import User, SitePolicy
-from .forms import LoginForm, CaissierCreateForm, AccountSettingsForm, TermsForm
+from .forms import LoginForm, CaissierCreateForm, CaissierEditForm, AccountSettingsForm, TermsForm
 
 def render_account_access_error(request, title, message):
     return render(request, 'accounts/access_error.html', {
@@ -177,7 +177,7 @@ def admin_account_settings(request):
     if request.method == 'POST' and submitted_tab == 'profile' and profile_form.is_valid():
         profile_form.save()
         messages.success(request, 'Paramètres du compte mis à jour.')
-        return redirect('admin_account_settings')
+        return redirect('/dashboard/admin/settings/?tab=profile')
 
     # Terms form
     term, _ = SitePolicy.objects.get_or_create(
@@ -194,18 +194,38 @@ def admin_account_settings(request):
     if request.method == 'POST' and submitted_tab == 'terms' and terms_form.is_valid():
         terms_form.save()
         messages.success(request, 'Conditions générales mises à jour.')
-        return redirect('admin_account_settings')
+        return redirect('/dashboard/admin/settings/?tab=terms')
+
+    # Add Pack form
+    from apps.vouchers.forms import VoucherPriceForm
+    pack_form = VoucherPriceForm(
+        request.POST if request.method == 'POST' and submitted_tab == 'add_pack' else None
+    )
+    if request.method == 'POST' and submitted_tab == 'add_pack' and pack_form.is_valid():
+        pack_form.save()
+        messages.success(request, 'Pack de vouchers créé avec succès.')
+        return redirect('/dashboard/admin/settings/?tab=packs')
 
     # Users list
     users = User.objects.order_by('role', 'username')
 
-    active_tab = submitted_tab if request.method == 'POST' else 'profile'
+    # Fetch voucher packs
+    from apps.vouchers.models import VoucherPrice
+    packs = VoucherPrice.objects.order_by('price')
+
+    active_tab = request.GET.get('tab', 'profile')
+    if request.method == 'POST':
+        active_tab = submitted_tab
+        if active_tab == 'add_pack':
+            active_tab = 'packs'
 
     return render(request, 'accounts/account_settings.html', {
         'form': profile_form,
         'terms_form': terms_form,
+        'pack_form': pack_form,
         'term': term,
         'users': users,
+        'packs': packs,
         'active_tab': active_tab,
     })
 

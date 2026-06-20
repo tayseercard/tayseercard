@@ -19,6 +19,7 @@ class VoucherPrice(models.Model):
 
     class Meta:
         ordering = ['price']
+        verbose_name_plural = 'Voucher Packs & Prices'
 
     def __str__(self):
         return f"{self.title} ({self.price} DZD)"

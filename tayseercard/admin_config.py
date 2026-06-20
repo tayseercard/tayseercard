@@ -1,3 +1,4 @@
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from apps.accounts.models import User
@@ -5,52 +6,26 @@ from apps.stores.models import Store, StorePartnerRequest
 from apps.vouchers.models import Voucher, VoucherScan, VoucherRequest, VoucherPrice
 
 
-@admin.register(User)
-class UserAdmin(BaseUserAdmin):
-    list_display = ['username', 'email', 'first_name', 'last_name', 'role', 'is_active']
-    list_filter = ['role', 'is_active']
-    fieldsets = BaseUserAdmin.fieldsets + (
-        ('Rôle', {'fields': ('role',)}),
-    )
-    add_fieldsets = BaseUserAdmin.add_fieldsets + (
-        ('Rôle', {'fields': ('role',)}),
-    )
+# Register custom User admin only once
+if not admin.site.is_registered(User):
+    @admin.register(User)
+    class UserAdmin(BaseUserAdmin):
+        list_display = ['username', 'email', 'first_name', 'last_name', 'role', 'is_active']
+        list_filter = ['role', 'is_active']
+        fieldsets = BaseUserAdmin.fieldsets + (
+            ('Rôle', {'fields': ('role',)}),
+        )
+        add_fieldsets = BaseUserAdmin.add_fieldsets + (
+            ('Rôle', {'fields': ('role',)}),
+        )
 
 
-@admin.register(Store)
-class StoreAdmin(admin.ModelAdmin):
-    list_display = ['name', 'manager', 'is_active', 'created_at', 'total_vouchers']
-    list_filter = ['is_active']
-    search_fields = ['name', 'manager__username']
-    filter_horizontal = ['caissiers']
+# Store admin registration moved to stores app (handled in apps/stores/admin.py)
+
+# StorePartnerRequest admin is registered in apps/stores/admin.py
 
 
-@admin.register(StorePartnerRequest)
-class StorePartnerRequestAdmin(admin.ModelAdmin):
-    list_display = ['store_name', 'full_name', 'email', 'phone', 'status', 'created_at']
-    list_filter = ['status', 'created_at']
-    search_fields = ['store_name', 'email', 'first_name', 'last_name']
-    readonly_fields = ['created_at', 'reviewed_at', 'reviewed_by']
-
-
-@admin.register(VoucherPrice)
-class VoucherPriceAdmin(admin.ModelAdmin):
-    list_display = ['title', 'value', 'price', 'is_active', 'created_at']
-    list_filter = ['is_active', 'created_at']
-    search_fields = ['title']
-    readonly_fields = ['created_at', 'updated_at']
-    fieldsets = (
-        ('Informations de base', {
-            'fields': ('title', 'description', 'is_active')
-        }),
-        ('Tarification', {
-            'fields': ('value', 'price')
-        }),
-        ('Métadonnées', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
+# VoucherPrice admin is registered in apps/vouchers/admin.py
 
 
 @admin.register(VoucherRequest)
@@ -86,16 +61,7 @@ class VoucherRequestAdmin(admin.ModelAdmin):
     get_total.short_description = 'Montant total'
 
 
-@admin.register(Voucher)
-class VoucherAdmin(admin.ModelAdmin):
-    list_display = ['title', 'store', 'value', 'price', 'status', 'is_active', 'created_at']
-    list_filter = ['status', 'is_active', 'store']
-    search_fields = ['title', 'store__name', 'code']
-    readonly_fields = ['code', 'qr_image', 'created_at']
-
-    def has_add_permission(self, request):
-        # Vouchers should be created through the app, not admin
-        return request.user.is_superuser
+# Voucher admin registration moved to apps/vouchers/admin.py (handled there)
 
 
 @admin.register(VoucherScan)

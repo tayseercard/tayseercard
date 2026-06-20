@@ -120,6 +120,10 @@
           data-bs-target="#tab-terms" type="button" role="tab">
           <i class="bi bi-file-earmark-text-fill"></i> Conditions générales
         </button>
+        <button class="nav-link {% if active_tab == 'packs' %}active{% endif %}" data-bs-toggle="tab"
+          data-bs-target="#tab-packs" type="button" role="tab">
+          <i class="bi bi-box-seam-fill"></i> Packs & Tarifs
+        </button>
       </div>
     </div>
   </div>
@@ -269,8 +273,156 @@
         </div>
       </div>
 
+      <!-- ===== PACKS TAB ===== -->
+      <div class="tab-pane fade {% if active_tab == 'packs' %}show active{% endif %}" id="tab-packs" role="tabpanel">
+        <div class="stat-card">
+          <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+              <div
+                style="width:44px; height:44px; background:#f5f3ff; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                <i class="bi bi-box-seam-fill" style="color:#7c3aed; font-size:1.25rem;"></i>
+              </div>
+              <div>
+                <h6 class="mb-0 fw-700">Packs & Tarifs</h6>
+                <small class="text-muted">Gérez les packs de vouchers proposés aux magasins.</small>
+              </div>
+            </div>
+            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#addPackModal"
+              style="background:#7c3aed; color:#fff; border-radius:10px; padding:8px 18px; font-size:0.9rem; font-weight:500;">
+              <i class="bi bi-plus-circle me-1"></i> Nouveau pack
+            </button>
+          </div>
+
+          {% if packs %}
+          <div class="row g-3">
+            {% for pack in packs %}
+            <div class="col-md-6 col-xl-4">
+              <div class="border rounded-3 p-3 h-100 position-relative d-flex flex-column {% if not pack.is_active %}opacity-75{% endif %}"
+                style="border-color: {% if pack.is_active %}#e0e7ff{% else %}#e2e8f0{% endif %} !important; background: {% if pack.is_active %}#ffffff{% else %}#f8fafc{% endif %}; border-width: 2px !important;">
+                
+                {% if not pack.is_active %}
+                <span class="badge bg-light text-muted border position-absolute" style="top:12px; right:12px; font-size:0.65rem;">Inactif</span>
+                {% endif %}
+
+                <div class="small fw-700 text-uppercase mb-1" style="color:#7c3aed; font-size:0.7rem; letter-spacing:0.05em;">
+                  <i class="bi bi-qr-code me-1"></i>{{ pack.pack_quantity }} QR Code{{ pack.pack_quantity|pluralize }}
+                </div>
+                
+                <h6 class="fw-700 text-dark mb-1">{{ pack.title }}</h6>
+                
+                <div class="fs-4 fw-800 my-2" style="color:#7c3aed;">
+                  {{ pack.price|floatformat:0 }} <span class="small fw-500 text-muted" style="font-size:0.75rem;">DA</span>
+                </div>
+                
+                <div class="text-muted small mb-2">{{ pack.pack_quantity }} bons de {{ pack.value|floatformat:0 }} DA inclus</div>
+
+                {% if pack.description %}
+                <p class="text-muted small mb-3 px-2 py-1 rounded" style="background:#f1f5f9; font-size:0.75rem; font-style:italic;">
+                  {{ pack.description }}
+                </p>
+                {% endif %}
+
+                <div class="d-flex gap-2 mt-auto">
+                  <a href="{% url 'pack_edit' pack.pk %}" class="btn btn-sm btn-light border w-100" style="font-size:0.8rem; border-radius:8px;">
+                    <i class="bi bi-pencil me-1"></i> Modifier
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-box-seam fs-1 d-block mb-2" style="opacity:0.3;"></i>
+            Aucun pack défini.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
+
+<!-- Modal for Adding Pack -->
+<div class="modal fade" id="addPackModal" tabindex="-1" aria-labelledby="addPackModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h5 class="modal-title fw-700 text-dark" id="addPackModalLabel">Nouveau pack & tarif</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="submitted_tab" value="add_pack">
+        <div class="modal-body text-start">
+          <div class="mb-3">
+            <label class="form-label fw-600 small">{{ pack_form.title.label }}</label>
+            {{ pack_form.title }}
+            {% if pack_form.title.errors %}
+            <div class="text-danger small mt-1">{{ pack_form.title.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-600 small">{{ pack_form.value.label }}</label>
+              {{ pack_form.value }}
+              {% if pack_form.value.errors %}
+              <div class="text-danger small mt-1">{{ pack_form.value.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-600 small">{{ pack_form.price.label }}</label>
+              {{ pack_form.price }}
+              {% if pack_form.price.errors %}
+              <div class="text-danger small mt-1">{{ pack_form.price.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-600 small">{{ pack_form.pack_quantity.label }}</label>
+            {{ pack_form.pack_quantity }}
+            {% if pack_form.pack_quantity.errors %}
+            <div class="text-danger small mt-1">{{ pack_form.pack_quantity.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-600 small">{{ pack_form.description.label }}</label>
+            {{ pack_form.description }}
+            {% if pack_form.description.errors %}
+            <div class="text-danger small mt-1">{{ pack_form.description.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="mb-2">
+            <div class="form-check form-switch">
+              {{ pack_form.is_active }}
+              <label class="form-check-label fw-600 small ms-2" for="{{ pack_form.is_active.id_for_label }}">
+                {{ pack_form.is_active.label }}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top-0 pt-0">
+          <button type="button" class="btn" data-bs-dismiss="modal" style="background:#f1f5f9; color:#475569; border-radius:10px; font-weight:500;">Annuler</button>
+          <button type="submit" class="btn" style="background:#7c3aed; color:#fff; border-radius:10px; font-weight:500;">
+            <i class="bi bi-check-lg me-1"></i> Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // If the add pack form has errors, automatically show the modal
+    {% if pack_form.errors %}
+      var addPackModal = new bootstrap.Modal(document.getElementById('addPackModal'));
+      addPackModal.show();
+    {% endif %}
+  });
+</script>
+{% endblock %}
 
 {% endblock %}

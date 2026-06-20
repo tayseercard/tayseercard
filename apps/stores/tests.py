@@ -133,7 +133,7 @@ class StorePendingWorkflowTests(TestCase):
         )
 
         # Log in admin to access approval page
-        self.client.login(email='admin@example.com', password='adminpassword')
+        self.client.login(username='admin@example.com', password='adminpassword')
 
         # Approve the request
         detail_url = reverse('store_request_detail', args=[partner_request.pk])
@@ -155,7 +155,7 @@ class StorePendingWorkflowTests(TestCase):
         self.assertEqual(email.to, ['partner@example.com'])
         self.assertIn("Votre compte est désormais actif", email.body)
         self.assertIn("[Celui choisi lors de votre demande d'inscription]", email.body)
-        self.assertNotIn("Mot de passe : ", email.body.replace("[Celui choisi lors de votre demande d'inscription]", ""))
+        self.assertNotIn("Mot de passe : ", email.body.replace("- Mot de passe : [Celui choisi lors de votre demande d'inscription]", ""))
 
     def test_admin_approve_non_existent_user_fallback(self):
         """
@@ -171,7 +171,7 @@ class StorePendingWorkflowTests(TestCase):
         )
 
         # Log in admin to access approval page
-        self.client.login(email='admin@example.com', password='adminpassword')
+        self.client.login(username='admin@example.com', password='adminpassword')
 
         # Approve the request
         detail_url = reverse('store_request_detail', args=[partner_request.pk])
@@ -215,7 +215,7 @@ class StorePendingWorkflowTests(TestCase):
         )
 
         # Log in admin
-        self.client.login(email='admin@example.com', password='adminpassword')
+        self.client.login(username='admin@example.com', password='adminpassword')
 
         # Get dashboard
         response = self.client.get(reverse('admin_dashboard'))

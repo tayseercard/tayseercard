@@ -232,10 +232,9 @@ def voucher_redeem(request, pk):
 @login_required
 @admin_required
 def pack_list(request):
-    """Admin manages VoucherPrice packs."""
-    from .models import VoucherPrice
-    packs = VoucherPrice.objects.order_by('price')
-    return render(request, 'vouchers/pack_list.html', {'packs': packs})
+    """Redirect to the unified admin settings packs tab."""
+    from django.urls import reverse
+    return redirect(reverse('admin_account_settings') + '?tab=packs')
 
 
 @login_required
