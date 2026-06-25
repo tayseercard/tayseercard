@@ -1,27 +1,13 @@
-name: Déploiement Automatique FTP
-
+name: 🚀 Deploy Project
 on:
   push:
     branches:
-      - main # Changez par 'master' si votre branche principale s'appelle ainsi
+      - main
 
 jobs:
   web-deploy:
-    name: Transfert des fichiers vers Octenium
+    name: 🎉 Check Code
     runs-on: ubuntu-latest
     steps:
-    - name: 1. Récupérer le code du dépôt
+    - name: 🚚 Get latest code
       uses: actions/checkout@v4
-      
-    - name: 2. Synchroniser les fichiers via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      with:
-       
-        server: tayseercard.com
-        username: exqxfpyq
-        password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ./tayseer_project/
-        # Paramètres d'authentification stricte :
-        port: 21
-        protocol: ftp
-        ftp-only: true
