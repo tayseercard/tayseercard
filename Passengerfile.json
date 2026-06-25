@@ -1,0 +1,6 @@
+{
+    "environment": "production",
+    "friendly_error_pages": true,
+    "passenger_management_http_server": false,
+    "instance_registry_dir": "/tmp"
+}
