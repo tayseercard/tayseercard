@@ -74,20 +74,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tayseercard.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'exqxfpyq_admin_tayseerdb',       # Votre nom de base cPanel
-        'USER': 'exqxfpyq_admin_tayseeruser',     # Votre utilisateur cPanel
-        'PASSWORD': '47052333$ss',  # Votre mot de passe
-        'HOST': 'localhost',
-        'PORT': '3306',                     # Port standard MySQL
-        'OPTIONS': {
-            'conv': {**initializer_conv, **custom_conversions},
-            'charset': 'utf8mb4',
-        },
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'exqxfpyq_admin_tayseerdb',       # Votre nom de base cPanel
+            'USER': 'exqxfpyq_admin_tayseeruser',     # Votre utilisateur cPanel
+            'PASSWORD': '47052333$ss',  # Votre mot de passe
+            'HOST': 'localhost',
+            'PORT': '3306',                     # Port standard MySQL
+            'OPTIONS': {
+                'conv': {**initializer_conv, **custom_conversions},
+                'charset': 'utf8mb4',
+            },
+        }
+    }
 AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_URL = '/accounts/login/'
