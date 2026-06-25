@@ -1,22 +1,31 @@
 import os
 from pathlib import Path
-import pymysql
-import pymysql.converters
-from pymysql.constants import FIELD_TYPE
-from pymysql.converters import conversions
+from pathlib import Path
 
+# ------------------------------------------------------------------
+# MySQL / PyMySQL configuration (optional)
+# ------------------------------------------------------------------
+try:
+    import pymysql               # noqa: F401
+    import pymysql.converters    # noqa: F401
+    from pymysql.constants import FIELD_TYPE  # noqa: F401
+    from pymysql.converters import conversions  # noqa: F401
 
-initializer_conv = pymysql.converters.conversions.copy()
-pymysql.install_as_MySQLdb()
-# Copier le dictionnaire de conversion par défaut
-custom_conversions = conversions.copy()
+    # Keep a copy of the default conversion map
+    initializer_conv = pymysql.converters.conversions.copy()
+    pymysql.install_as_MySQLdb()
 
-# Forcer la conversion des types DATETIME et TIMESTAMP en vrais objets datetime Python
-custom_conversions[FIELD_TYPE.DATETIME] = pymysql.converters.convert_datetime
-custom_conversions[FIELD_TYPE.TIMESTAMP] = pymysql.converters.convert_datetime
+    # Custom conversion rules
+    custom_conversions = conversions.copy()
+    custom_conversions[FIELD_TYPE.DATETIME] = pymysql.converters.convert_datetime
+    custom_conversions[FIELD_TYPE.TIMESTAMP] = pymysql.converters.convert_datetime
 
-# Associer ces règles de conversion à PyMySQL
-pymysql.install_as_MySQLdb()
+    # Apply the custom converters to Django’s MySQL backend
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    # PyMySQL isn’t installed – fall back to the default MySQL client.
+    initializer_conv = {}
+    custom_conversions = {}
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,21 +83,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tayseercard.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'exqxfpyq_admin_tayseerdb',       # Votre nom de base cPanel
-        'USER': 'exqxfpyq_admin_tayseeruser',     # Votre utilisateur cPanel
-        'PASSWORD': '47052333$ss',  # Votre mot de passe
-        'HOST': 'localhost',
-        'PORT': '3306',                     # Port standard MySQL
-        'OPTIONS': {
-            'conv': custom_conversions,  # On force Django à appliquer nos convertisseurs temporels
-            'conv': initializer_conv,  # <--- Ajout crucial ici
-            'charset': 'utf8mb4',
-        },
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    # Production MySQL configuration (Octenium / phpMyAdmin)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('MYSQL_DB_NAME', 'octenium_db'),
+            'USER': os.getenv('MYSQL_USER', 'octenium_user'),
+            'PASSWORD': os.getenv('MYSQL_PASSWORD', 'octenium_pass'),
+            'HOST': os.getenv('MYSQL_HOST', 'octenium_host'),
+            'PORT': os.getenv('MYSQL_PORT', '3306'),
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8mb4',
+                # Merge custom converters if you still use PyMySQL
+                'conv': {**initializer_conv, **custom_conversions},
+            },
+        }
+    }
 AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_URL = '/accounts/login/'
