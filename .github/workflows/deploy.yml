@@ -1,0 +1,22 @@
+name: Déploiement Automatique FTP
+
+on:
+  push:
+    branches:
+      - main # Changez par 'master' si votre branche principale s'appelle ainsi
+
+jobs:
+  web-deploy:
+    name: Transfert des fichiers vers Octenium
+    runs-on: ubuntu-latest
+    steps:
+    - name: 1. Récupérer le code du dépôt
+      uses: actions/checkout@v4
+      
+    - name: 2. Synchroniser les fichiers via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ftp.tayseercard.com
+        username: exqxfpyq
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: ./public_html/
