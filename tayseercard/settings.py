@@ -113,3 +113,4 @@ USE_TZ = False
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@tayseercard.com'
+
