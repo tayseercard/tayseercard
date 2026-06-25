@@ -18,3 +18,4 @@ django.setup()
 
 # Définir l'application pour Passenger
 application = get_wsgi_application()
+# Définir l'application pour Passenger
