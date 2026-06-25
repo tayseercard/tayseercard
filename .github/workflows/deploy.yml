@@ -16,7 +16,12 @@ jobs:
     - name: 2. Synchroniser les fichiers via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        server: ftp.tayseercard.com
+       
+        server: tayseercard.com
         username: exqxfpyq
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: ./tayseer_project/
+        # Paramètres d'authentification stricte :
+        port: 21
+        protocol: ftp
+        ftp-only: true
