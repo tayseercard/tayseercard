@@ -1,5 +1,6 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/exqxfpyq/public_html
+    - export DEPLOYPATH=/home/exqxfpyq/tayseer_prod/
+    - /bin/mkdir -p $DEPLOYPATH
     - /bin/cp -R * $DEPLOYPATH
