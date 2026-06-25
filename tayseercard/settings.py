@@ -83,8 +83,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',                     # Port standard MySQL
         'OPTIONS': {
-            'conv': custom_conversions,  # On force Django à appliquer nos convertisseurs temporels
-            'conv': initializer_conv,  # <--- Ajout crucial ici
+            'conv': {**initializer_conv, **custom_conversions},
             'charset': 'utf8mb4',
         },
     }

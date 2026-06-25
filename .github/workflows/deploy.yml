@@ -19,4 +19,4 @@ jobs:
         server: ftp.tayseercard.com
         username: exqxfpyq
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ./public_html/
+        server-dir: ./tayseer_project/

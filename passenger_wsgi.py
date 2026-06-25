@@ -1,19 +1,20 @@
 import os
 import sys
 import django
-from django.core.management import call_command
 from django.core.wsgi import get_wsgi_application
 
-# 1. Ajouter le chemin de votre projet
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'tayseercard'))
+# Define the project root directory
+project_root = os.path.dirname(os.path.abspath(__file__))
 
-# 2. Variable d'environnement pour les paramètres
-os.environ['DJANGO_SETTINGS_MODULE'] = 'tayseercard.settings'
+# Add the project root to sys.path so django and apps can be imported
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-# 3. Charger et initialiser le registre de Django (Règle le problème AppRegistryNotReady)
+# Variable d'environnement pour les paramètres
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tayseercard.settings')
+
+# Charger et initialiser le registre de Django
 django.setup()
 
-# 4. Lancer les migrations de manière sécurisée
-
-# 5. Définir l'application pour Passenger
+# Définir l'application pour Passenger
 application = get_wsgi_application()
